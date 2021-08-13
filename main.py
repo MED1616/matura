@@ -117,12 +117,11 @@ def findLegalMoves(board, chosenPiece, turn):
         else:
             yDir = 1
         
-        if y != 7 and y != 0:
-            if 8 > x + 1 > -1  and board[y - 1 * yDir][x + 1] != None and board[y - 1 * yDir][x + 1].color != turn:
-                legalMoves.append((1, - yDir))
+        if 8 > x + 1 > -1 and 8 > y - 1 * yDir > -1 and board[y - 1 * yDir][x + 1] != None and board[y - 1 * yDir][x + 1].color != turn:
+            legalMoves.append((1, - yDir))
                         
-            elif 8 > x - 1 > -1 and board[y - 1 * yDir][x - 1] != None and board[y - 1 * yDir][x - 1].color != turn:
-                legalMoves.append((-1, -yDir)) 
+        elif 8 > x - 1 > -1 and 8 > y - 1 * yDir > -1 and board[y - 1 * yDir][x - 1] != None and board[y - 1 * yDir][x - 1].color != turn:
+            legalMoves.append((-1, -yDir)) 
 
     ###############################################
 
