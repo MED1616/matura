@@ -199,6 +199,32 @@ def moveToNotation(moveHistory, notationHistory):
     notationHistory.append(notation)
     return notationHistory
     
+def getPawnPromotion(x, y):
+    top, left, squareSize = defineSize()
+    width, heigth = screen.get_size()
+
+    x = int((x - width/2 + 2*squareSize)/squareSize)
+    y = int((y - heigth/2 + squareSize/2)/squareSize)
+
+    
+
+    if y == 0:
+        
+        if x == 0:
+            
+            return "queen"
+        elif x == 1:
+            return "rook"
+        elif x == 2:
+            return "bishop"
+        elif x == 3:
+            return "knight"
+        else: 
+            return 0
+    else:
+        return 0
+
+
 def main():
     top, left, squareSize = defineSize()
     turn = "white"
@@ -217,9 +243,10 @@ def main():
             if event.type == pygame.QUIT: 
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0] == True:
+                top, left, squareSize = defineSize()
                 pos = pygame.mouse.get_pos()
                 x, y = pos
-
+                
                
                 if  left + 8*squareSize > x > left and top + 8*squareSize > y > top:
                     x, y = findClickedSquare(pos)
@@ -271,15 +298,72 @@ def main():
                                 board[oldY][oldX - 1] = board[oldY][oldX - 4]
                                 board[oldY][oldX - 4] = None
 
-                            board[y][x] = board[oldY][oldX]
-                            board[oldY][oldX] = None
-                            chosenPiece = None
-                            target = None
-                            if turn == "white":
-                                turn = "black"
+                            #########################################
+                            #promotion
+                            undidMove = False #for control later on
+                            if board[oldY][oldX].name == "pawn" and (y == 7 or y == 0):
+                                #promotion
+                                screen.fill(color)
+                                #top, left, squareSize = defineSize()
+                                width, height = screen.get_size()
+
+                                c = board[oldY][oldX].color
+                                promotionPieces = ["queen", "rook", "bishop", "knight"]
+
+                                for a in range(4):
+                                    left = width/2 + (a - 2) * squareSize
+                                    top = height/2 - squareSize/2
+                                    square = (left, top, squareSize, squareSize)
+                                    if a % 2 == 0:
+                                        sColor = lightBrown
+                                    else:
+                                        sColor = brown
+                                    
+                                    pygame.draw.rect(screen, sColor, square)
+
+                                    name = promotionPieces[a]
+
+                                    image1 = pygame.image.load("Sprites/" + c + "_" + name + ".png")
+                                    image1 = pygame.transform.smoothscale(image1, (squareSize, squareSize))
+                                    screen.blit(image1, (left, top))
+
+                                pygame.display.update()
+
+                                promoteTo = None
+                                
+
+                                while promoteTo != "queen" and promoteTo != "rook" and promoteTo != "knight" and promoteTo != "bishop" and promoteTo != 0:
+                                    for event in pygame.event.get():
+                                        if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0] == True:
+                                            x1, y1 = pygame.mouse.get_pos()
+                                            promoteTo = getPawnPromotion(x1, y1)
+                                
+                                if promoteTo == "queen": 
+                                    board[oldY][oldX] = pieces.Queen(turn)
+                                elif promoteTo == "rook": 
+                                    board[oldY][oldX] = pieces.Rook(turn)
+                                elif promoteTo == "bishop": 
+                                    board[oldY][oldX] = pieces.Bishop(turn)
+                                elif promoteTo == "knight": 
+                                    board[oldY][oldX] = pieces.Knight(turn)
+                                else:
+                                    undidMove = True
+                            #######################################################
+                            
+                            if undidMove == False: #if not promoted
+                                board[y][x] = board[oldY][oldX]
+                                board[oldY][oldX] = None
+                                chosenPiece = None
+                                target = None
+                                if turn == "white":
+                                    turn = "black"
+                                else:
+                                    turn = "white"
+                                drawBoard(board)
                             else:
-                                turn = "white"
-                            drawBoard(board)
+                                target = None
+                                drawBoard(board)
+
                         elif board[y][x] == None:
                             chosenPiece = None
                             target = None
