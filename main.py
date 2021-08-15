@@ -25,7 +25,7 @@ def defineSize():
     squareSize = int((size[1] - 2*top) / 8)
     return int(top), int(left), int(squareSize)
 
-def drawBoard(board):
+def drawBoard(board, turn):
     top, left, squareSize = defineSize()
     
     screen.fill(color)
@@ -43,7 +43,8 @@ def drawBoard(board):
                 pygame.draw.rect(screen, lightBrown, square)
                 
     drawPieces(board)
-    
+    if inCheck(board, turn):
+        drawCheck(board, turn)
     pygame.display.update()
 
 
@@ -81,12 +82,13 @@ def drawPieces(board):
                 coord = ((left + squareSize * a), (top + squareSize * b))
                 image = pygame.transform.smoothscale(board[b][a].sprite, (squareSize, squareSize))
                 screen.blit(image, coord)
-                
+    pygame.display.update()
+
 def findLegalMoves(board, chosenPiece, turn):
     x, y = chosenPiece
-    moveset = list(board[y][x].moves)
+    moveset = []
 
-    mov = list(moveset)
+    mov = list(board[y][x].moves)
 
     legalMoves = []
     
@@ -111,7 +113,8 @@ def findLegalMoves(board, chosenPiece, turn):
                     
                 else:
                     break
-
+        
+        #capture sideways
         if board[y][x].color == "black":
             yDir = -1
         else:
@@ -139,14 +142,10 @@ def findLegalMoves(board, chosenPiece, turn):
     ###########################################
     if board[y][x].name == "king":
         for m in mov:
-            a = 1
-            if 8 > x + m[0] * a > -1 and 8 > y + m[1] * a > -1 and board[y + m[1] * a][x + m[0] * a] == None:
-                moveset.append((m[0] * a, m[1] * a))
-            elif 8 > x + m[0] * a > -1 and 8 > y + m[1] * a > -1 and board[y + m[1] * a][x + m[0] * a].color != turn:
-                moveset.append((m[0] * a, m[1] * a))
-                break
-            else:
-                break
+            if 8 > x + m[0] > -1 and 8 > y + m[1] > -1 and board[y + m[1]][x + m[0]] == None:
+                moveset.append((m[0], m[1]))
+            elif 8 > x + m[0] > -1 and 8 > y + m[1] > -1 and board[y + m[1]][x + m[0]].color != turn:
+                moveset.append((m[0], m[1])) 
 
             ######################################
         if board[y][x].castlingAllowed == True:
@@ -173,12 +172,17 @@ def findLegalMoves(board, chosenPiece, turn):
             if longCastle == (True, True):
                 moveset.append((-2, 0))
     ##############################################
-    
+    if board[y][x].name == "knight":
+        for m in mov:
+            if 8 > x + m[0] > -1 and 8 > y + m[1] > -1 and board[y + m[1]][x + m[0]] == None:
+                moveset.append((m[0], m[1]))
+            elif 8 > x + m[0] > -1 and 8 > y + m[1] > -1 and board[y + m[1]][x + m[0]].color != turn:
+                moveset.append((m[0], m[1])) 
 
     for m in moveset:
         if 8 > x + m[0] > -1 and 8 > y + m[1] > -1 and (board[y + m[1]][x + m[0]] == None or board[y + m[1]][x + m[0]].color != turn):
             legalMoves.append((m[0], m[1]))
-        
+    
     
     return legalMoves
 
@@ -206,8 +210,6 @@ def getPawnPromotion(x, y):
     x = int((x - width/2 + 2*squareSize)/squareSize)
     y = int((y - heigth/2 + squareSize/2)/squareSize)
 
-    
-
     if y == 0:
         
         if x == 0:
@@ -224,6 +226,37 @@ def getPawnPromotion(x, y):
     else:
         return 0
 
+def findKing(board, turn):
+    for y in range(8):
+        for x in range(8):
+            if board[y][x] != None and board[y][x].name == "king" and board[y][x].color == turn:
+                return x, y
+
+def inCheck(board, turn):
+    a, b = findKing(board, turn)
+
+    #we want to know whether the black king is in check after white moved, therefore we need to find the legal moves of white(def findLegalMove). 
+    #But turn would be black because white just moved, so we switch turn.
+    if turn == "white":
+        turn = "black"
+    else:
+        turn = "white"
+
+    for y in range(8):
+        for x in range(8):
+            if board[y][x] != None and board[y][x].color == turn: #this turn and the turn in the next line need to be the same
+                lMoves = findLegalMoves(board, (x, y), turn)
+                for m in lMoves:
+                    if m[0] + x == a and m[1] + y == b:
+                        return True
+    return False
+
+def drawCheck(board, turn):
+    top, left, squareSize = defineSize()
+    x, y = findKing(board, turn)
+    square = (left + x * squareSize, top + y * squareSize, squareSize, squareSize)
+    pygame.draw.rect(screen, (255, 0, 0), square)
+    drawPieces(board)
 
 def main():
     top, left, squareSize = defineSize()
@@ -236,7 +269,7 @@ def main():
     
     
     board = newBoard()
-    drawBoard(board)
+    drawBoard(board, turn)
 
     while True:
         for event in pygame.event.get():
@@ -264,7 +297,8 @@ def main():
 
                     if chosenPiece != None:
                         x, y = chosenPiece
-                        drawBoard(board)
+                        drawBoard(board, turn)
+        
                         drawLegalMoves(board, chosenPiece, turn)
                         
                         
@@ -273,6 +307,10 @@ def main():
                         
                         drawPieces(board)
 
+                        if inCheck(board, turn):
+                            drawCheck(board, turn)
+                        else:
+                            drawPieces(board)
                         pygame.display.update()
                         
                     if target != None and chosenPiece != None:
@@ -327,6 +365,8 @@ def main():
                                     image1 = pygame.transform.smoothscale(image1, (squareSize, squareSize))
                                     screen.blit(image1, (left, top))
 
+                                if inCheck(board, turn):
+                                    drawCheck(board, turn)
                                 pygame.display.update()
 
                                 promoteTo = None
@@ -355,25 +395,28 @@ def main():
                                 board[oldY][oldX] = None
                                 chosenPiece = None
                                 target = None
+
                                 if turn == "white":
                                     turn = "black"
                                 else:
                                     turn = "white"
-                                drawBoard(board)
+                                
+                                drawBoard(board, turn)
+
                             else:
                                 target = None
-                                drawBoard(board)
+                                drawBoard(board, turn)
 
                         elif board[y][x] == None:
                             chosenPiece = None
                             target = None
-                            drawBoard(board)
+                            drawBoard(board, turn)
                         
                 
             elif event.type == pygame.VIDEORESIZE:
                 top, left, squareSize = defineSize()
                 screen.fill(color)
-                drawBoard(board)
+                drawBoard(board, turn)
             
 
 main()
