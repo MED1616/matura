@@ -258,6 +258,34 @@ def drawCheck(board, turn):
     pygame.draw.rect(screen, (255, 0, 0), square)
     drawPieces(board)
 
+def drawPromotion(c):
+    screen.fill(color)
+    brown = (153, 102, 51)
+    lightBrown = (236, 217, 198)
+    top, left, squareSize = defineSize()
+    width, height = screen.get_size()
+    
+    promotionPieces = ["queen", "rook", "bishop", "knight"]
+
+    for a in range(4):
+        left = width/2 + (a - 2) * squareSize
+        top = height/2 - squareSize/2
+        square = (left, top, squareSize, squareSize)
+        if a % 2 == 0:
+            sColor = lightBrown
+        else:
+            sColor = brown
+                                    
+        pygame.draw.rect(screen, sColor, square)
+
+        name = promotionPieces[a]
+
+        image1 = pygame.image.load("Sprites/" + c + "_" + name + ".png")
+        image1 = pygame.transform.smoothscale(image1, (squareSize, squareSize))
+        screen.blit(image1, (left, top))
+
+        pygame.display.update()
+
 def main():
     top, left, squareSize = defineSize()
     turn = "white"
@@ -323,7 +351,8 @@ def main():
                         if diff in m:
                             moveHistory.append(board[oldY][oldX].notation + str(x) + str(8 - y))
                             notationHistory = moveToNotation(moveHistory, notationHistory)
-                            
+                            print(notationHistory)
+                            #add Checks, castling and promotion to notation
                             if board[oldY][oldX].name == "king" or board[oldY][oldX].name == "rook":
                                 board[oldY][oldX].castlingAllowed = False
                             
@@ -341,6 +370,9 @@ def main():
                             undidMove = False #for control later on
                             if board[oldY][oldX].name == "pawn" and (y == 7 or y == 0):
                                 #promotion
+                                drawPromotion(board[oldY][oldX].color)
+
+                                """
                                 screen.fill(color)
                                 #top, left, squareSize = defineSize()
                                 width, height = screen.get_size()
@@ -364,10 +396,11 @@ def main():
                                     image1 = pygame.image.load("Sprites/" + c + "_" + name + ".png")
                                     image1 = pygame.transform.smoothscale(image1, (squareSize, squareSize))
                                     screen.blit(image1, (left, top))
+                                """
 
                                 if inCheck(board, turn):
                                     drawCheck(board, turn)
-                                pygame.display.update()
+                                #pygame.display.update()
 
                                 promoteTo = None
                                 
@@ -377,7 +410,13 @@ def main():
                                         if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0] == True:
                                             x1, y1 = pygame.mouse.get_pos()
                                             promoteTo = getPawnPromotion(x1, y1)
-                                
+                                        ###########################    
+                                        elif event.type == pygame.VIDEORESIZE:
+                                            drawPromotion(board[oldY][oldX].color)
+                                        ###########################
+                                        elif event.type == pygame.QUIT: 
+                                            sys.exit()
+
                                 if promoteTo == "queen": 
                                     board[oldY][oldX] = pieces.Queen(turn)
                                 elif promoteTo == "rook": 
