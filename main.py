@@ -84,6 +84,18 @@ def drawPieces(board):
                 screen.blit(image, coord)
     pygame.display.update()
 
+def drawChosenPiece(board, x, y):
+    top, left, squareSize = defineSize()
+
+    square = ((left + x * squareSize), (top + y * squareSize), squareSize, squareSize)
+    pygame.draw.rect(screen, (0, 200, 0 ), square)
+
+    coord = ((left + squareSize * x), (top + squareSize * y))
+    image = pygame.transform.smoothscale(board[y][x].sprite, (squareSize, squareSize))
+    screen.blit(image, coord)
+    pygame.display.update()
+
+
 def findLegalMoves(board, chosenPiece, turn):
     x, y = chosenPiece
     moveset = []
@@ -123,7 +135,7 @@ def findLegalMoves(board, chosenPiece, turn):
         if 8 > x + 1 > -1 and 8 > y - 1 * yDir > -1 and board[y - 1 * yDir][x + 1] != None and board[y - 1 * yDir][x + 1].color != turn:
             legalMoves.append((1, - yDir))
                         
-        elif 8 > x - 1 > -1 and 8 > y - 1 * yDir > -1 and board[y - 1 * yDir][x - 1] != None and board[y - 1 * yDir][x - 1].color != turn:
+        if 8 > x - 1 > -1 and 8 > y - 1 * yDir > -1 and board[y - 1 * yDir][x - 1] != None and board[y - 1 * yDir][x - 1].color != turn:
             legalMoves.append((-1, -yDir)) 
 
     ###############################################
@@ -308,7 +320,24 @@ def main():
                 pos = pygame.mouse.get_pos()
                 x, y = pos
                 
-               
+                if inCheck(board, turn):
+                    saved = False
+                    print(turn)
+                    for a in range(8):
+                        for b in range(8):
+                            if board[b][a] != None and board[b][a].color == turn:
+                                lMoves = findLegalMoves(board, (a, b), turn)
+                                virtualBoard = []
+                                for m in lMoves:
+                                    for q in range(8):
+                                        virtualBoard.append(list(board[q]))
+                                    virtualBoard[b + m[1]][a + m[0]] = virtualBoard[b][a]
+                                    virtualBoard[b][a] = None
+                                    if not inCheck(virtualBoard, turn):
+                                        saved = True
+                    if not saved:
+                        print("Checkmate")
+
                 if  left + 8*squareSize > x > left and top + 8*squareSize > y > top:
                     x, y = findClickedSquare(pos)
 
@@ -330,15 +359,11 @@ def main():
                         drawLegalMoves(board, chosenPiece, turn)
                         
                         
-                        square = ((left + x * squareSize), (top + y * squareSize), squareSize, squareSize)
-                        pygame.draw.rect(screen, (0, 200, 0 ), square)
-                        
-                        drawPieces(board)
+                        drawChosenPiece(board, x, y)
 
                         if inCheck(board, turn):
                             drawCheck(board, turn)
-                        else:
-                            drawPieces(board)
+                        
                         pygame.display.update()
                         
                     if target != None and chosenPiece != None:
@@ -352,7 +377,8 @@ def main():
                             moveHistory.append(board[oldY][oldX].notation + str(x) + str(8 - y))
                             notationHistory = moveToNotation(moveHistory, notationHistory)
                             print(notationHistory)
-                            #add Checks, castling and promotion to notation
+                            #add Checks, castling, captures and promotion to notation
+                            
                             if board[oldY][oldX].name == "king" or board[oldY][oldX].name == "rook":
                                 board[oldY][oldX].castlingAllowed = False
                             
@@ -371,32 +397,6 @@ def main():
                             if board[oldY][oldX].name == "pawn" and (y == 7 or y == 0):
                                 #promotion
                                 drawPromotion(board[oldY][oldX].color)
-
-                                """
-                                screen.fill(color)
-                                #top, left, squareSize = defineSize()
-                                width, height = screen.get_size()
-
-                                c = board[oldY][oldX].color
-                                promotionPieces = ["queen", "rook", "bishop", "knight"]
-
-                                for a in range(4):
-                                    left = width/2 + (a - 2) * squareSize
-                                    top = height/2 - squareSize/2
-                                    square = (left, top, squareSize, squareSize)
-                                    if a % 2 == 0:
-                                        sColor = lightBrown
-                                    else:
-                                        sColor = brown
-                                    
-                                    pygame.draw.rect(screen, sColor, square)
-
-                                    name = promotionPieces[a]
-
-                                    image1 = pygame.image.load("Sprites/" + c + "_" + name + ".png")
-                                    image1 = pygame.transform.smoothscale(image1, (squareSize, squareSize))
-                                    screen.blit(image1, (left, top))
-                                """
 
                                 if inCheck(board, turn):
                                     drawCheck(board, turn)
