@@ -42,9 +42,10 @@ def drawBoard(board, turn):
                 square = ((left + a * squareSize), (top + b * squareSize), squareSize, squareSize)
                 pygame.draw.rect(screen, lightBrown, square)
                 
-    drawPieces(board)
     if inCheck(board, turn):
         drawCheck(board, turn)
+    else:
+        drawPieces(board)
     pygame.display.update()
 
 
@@ -319,7 +320,7 @@ def main():
                 top, left, squareSize = defineSize()
                 pos = pygame.mouse.get_pos()
                 x, y = pos
-                
+                """
                 if inCheck(board, turn):
                     saved = False
                     print(turn)
@@ -337,7 +338,7 @@ def main():
                                         saved = True
                     if not saved:
                         print("Checkmate")
-
+                """
                 if  left + 8*squareSize > x > left and top + 8*squareSize > y > top:
                     x, y = findClickedSquare(pos)
 
@@ -450,6 +451,30 @@ def main():
                             chosenPiece = None
                             target = None
                             drawBoard(board, turn)
+
+                        if inCheck(board, turn):
+
+                            saved = False
+                            for b in range(8):
+                                for a in range(8):
+                                    if board[b][a] != None and board[b][a].color == turn:
+                                        lMoves = findLegalMoves(board, (a, b), turn)
+                                        virtualBoard = []
+                                        if board[b][a].name == "knight":
+                                            print(lMoves)
+                                        for m in lMoves:
+                                            for q in range(8):
+                                                virtualBoard.append(list(board[q]))
+                                            virtualBoard[b + m[1]][a + m[0]] = virtualBoard[b][a]
+                                            virtualBoard[b][a] = None
+                                            if not inCheck(virtualBoard, turn):
+                                                saved = True
+                                            else:
+                                                lMoves.remove(m)
+                                        print(lMoves, board[b][a].name, (a, b))
+                            if not saved:
+                                print("Checkmate")
+
                         
                 
             elif event.type == pygame.VIDEORESIZE:
