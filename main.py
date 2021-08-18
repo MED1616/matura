@@ -306,17 +306,16 @@ def removeMovesDueToCheck(board, a, b, turn, legalMoves):
     if board[b][a] != None and board[b][a].color == turn:
         virtualBoard = []
         lMovesCopy = list(legalMoves)
-        if board[b][a].name == "king":
-            print(board[b][a].name, legalMoves)
         for m in lMovesCopy:
+            virtualBoard = []
             for q in range(8):
                 virtualBoard.append(list(board[q]))
             virtualBoard[b + m[1]][a + m[0]] = virtualBoard[b][a]
             virtualBoard[b][a] = None
             if inCheck(virtualBoard, turn):
                 legalMoves.remove(m)
-        if board[b][a].name == "king":
-            print(board[b][a].name, legalMoves)
+        if board[b][a].name == "pawn":
+            print(board[b][a].name, legalMoves, lMovesCopy, "line 318")
     return legalMoves
 
 def findAllLegalMoves(board, chosenPiece, turn):
@@ -379,7 +378,7 @@ def main():
                         oldX, oldY = chosenPiece
                         diff = (x - oldX, y- oldY)
                        
-                        m = findLegalMoves(board, chosenPiece, turn)
+                        m = findAllLegalMoves(board, chosenPiece, turn)
 
                         if diff in m:
                             moveHistory.append(board[oldY][oldX].notation + str(x) + str(8 - y))
@@ -469,6 +468,7 @@ def main():
                                         virtualBoard = []
                                         lMovesCopy = list(lMoves)
                                         for m in lMovesCopy:
+                                            virtualBoard = []
                                             for q in range(8):
                                                 virtualBoard.append(list(board[q]))
                                             virtualBoard[b + m[1]][a + m[0]] = virtualBoard[b][a]
