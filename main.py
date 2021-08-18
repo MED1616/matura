@@ -314,8 +314,6 @@ def removeMovesDueToCheck(board, a, b, turn, legalMoves):
             virtualBoard[b][a] = None
             if inCheck(virtualBoard, turn):
                 legalMoves.remove(m)
-        if board[b][a].name == "pawn":
-            print(board[b][a].name, legalMoves, lMovesCopy, "line 318")
     return legalMoves
 
 def findAllLegalMoves(board, chosenPiece, turn):
