@@ -452,6 +452,7 @@ def main():
                                     variant(board, target, turn)
                                 else:
                                     board[y][x] = board[oldY][oldX]
+                                
                                 board[oldY][oldX] = None
                                 chosenPiece = None
                                 target = None
