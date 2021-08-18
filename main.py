@@ -298,6 +298,20 @@ def drawPromotion(c):
         screen.blit(image1, (left, top))
 
         pygame.display.update()
+###############################################
+def removeMovesDueToCheck(board, a, b, turn):
+    if board[b][a] != None and board[b][a].color == turn:
+        lMoves = findLegalMoves(board, (a, b), turn)
+        virtualBoard = []
+        lMovesCopy = list(lMoves)
+        for m in lMovesCopy:
+            for q in range(8):
+                virtualBoard.append(list(board[q]))
+            virtualBoard[b + m[1]][a + m[0]] = virtualBoard[b][a]
+            virtualBoard[b][a] = None
+            if inCheck(virtualBoard, turn):
+                lMoves.remove(m)
+    return lMoves
 
 def main():
     top, left, squareSize = defineSize()
@@ -320,25 +334,7 @@ def main():
                 top, left, squareSize = defineSize()
                 pos = pygame.mouse.get_pos()
                 x, y = pos
-                """
-                if inCheck(board, turn):
-                    saved = False
-                    print(turn)
-                    for a in range(8):
-                        for b in range(8):
-                            if board[b][a] != None and board[b][a].color == turn:
-                                lMoves = findLegalMoves(board, (a, b), turn)
-                                virtualBoard = []
-                                for m in lMoves:
-                                    for q in range(8):
-                                        virtualBoard.append(list(board[q]))
-                                    virtualBoard[b + m[1]][a + m[0]] = virtualBoard[b][a]
-                                    virtualBoard[b][a] = None
-                                    if not inCheck(virtualBoard, turn):
-                                        saved = True
-                    if not saved:
-                        print("Checkmate")
-                """
+                
                 if  left + 8*squareSize > x > left and top + 8*squareSize > y > top:
                     x, y = findClickedSquare(pos)
 
@@ -460,9 +456,8 @@ def main():
                                     if board[b][a] != None and board[b][a].color == turn:
                                         lMoves = findLegalMoves(board, (a, b), turn)
                                         virtualBoard = []
-                                        if board[b][a].name == "knight":
-                                            print(lMoves)
-                                        for m in lMoves:
+                                        lMovesCopy = list(lMoves)
+                                        for m in lMovesCopy:
                                             for q in range(8):
                                                 virtualBoard.append(list(board[q]))
                                             virtualBoard[b + m[1]][a + m[0]] = virtualBoard[b][a]
