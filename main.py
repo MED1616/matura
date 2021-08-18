@@ -447,6 +447,7 @@ def main():
                             #######################################################
                             
                             if undidMove == False: #if not promoted
+                                #variant
                                 if board[oldY][oldX].name == "pawn" and board[target[1]][target[0]] != None and board[target[1]][target[0]].name != "pawn":
                                     variant(board, target, turn)
                                 else:
