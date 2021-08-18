@@ -321,6 +321,18 @@ def findAllLegalMoves(board, chosenPiece, turn):
     legalMoves = findLegalMoves(board, chosenPiece, turn)
     return removeMovesDueToCheck(board, a, b, turn, legalMoves)
 
+def variant(board, target, turn):
+    x, y = target
+    
+    if board[y][x].name == "queen": 
+        board[y][x] = pieces.Queen(turn)
+    elif board[y][x].name == "rook": 
+        board[y][x] = pieces.Rook(turn)
+    elif board[y][x].name == "bishop": 
+        board[y][x] = pieces.Bishop(turn)
+    elif board[y][x].name == "knight": 
+        board[y][x] = pieces.Knight(turn)
+
 def main():
     top, left, squareSize = defineSize()
     turn = "white"
@@ -435,7 +447,10 @@ def main():
                             #######################################################
                             
                             if undidMove == False: #if not promoted
-                                board[y][x] = board[oldY][oldX]
+                                if board[oldY][oldX].name == "pawn" and board[target[1]][target[0]] != None and board[target[1]][target[0]].name != "pawn":
+                                    variant(board, target, turn)
+                                else:
+                                    board[y][x] = board[oldY][oldX]
                                 board[oldY][oldX] = None
                                 chosenPiece = None
                                 target = None
