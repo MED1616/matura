@@ -201,7 +201,8 @@ def findLegalMoves(board, chosenPiece, turn):
 
 def drawLegalMoves(board, chosenPiece, turn):
     top, left, squareSize = defineSize()
-    legalMoves = findLegalMoves(board, chosenPiece, turn)
+    ######################## findLegalMoves -> findAllLegalMoves
+    legalMoves = findAllLegalMoves(board, chosenPiece, turn)
     x, y = chosenPiece
    
     for l in legalMoves:
@@ -209,6 +210,7 @@ def drawLegalMoves(board, chosenPiece, turn):
         center = ((l[0]*squareSize + left + squareSize/2), (l[1]*squareSize + top + squareSize/2))
         pygame.draw.circle(screen, (10, 10, 10), center, squareSize/3)
     
+
 def moveToNotation(moveHistory, notationHistory):
     length = len(moveHistory)
     lastMove = moveHistory[length - 1]
@@ -298,20 +300,29 @@ def drawPromotion(c):
         screen.blit(image1, (left, top))
 
         pygame.display.update()
+
 ###############################################
-def removeMovesDueToCheck(board, a, b, turn):
+def removeMovesDueToCheck(board, a, b, turn, legalMoves):
     if board[b][a] != None and board[b][a].color == turn:
-        lMoves = findLegalMoves(board, (a, b), turn)
         virtualBoard = []
-        lMovesCopy = list(lMoves)
+        lMovesCopy = list(legalMoves)
+        if board[b][a].name == "king":
+            print(board[b][a].name, legalMoves)
         for m in lMovesCopy:
             for q in range(8):
                 virtualBoard.append(list(board[q]))
             virtualBoard[b + m[1]][a + m[0]] = virtualBoard[b][a]
             virtualBoard[b][a] = None
             if inCheck(virtualBoard, turn):
-                lMoves.remove(m)
-    return lMoves
+                legalMoves.remove(m)
+        if board[b][a].name == "king":
+            print(board[b][a].name, legalMoves)
+    return legalMoves
+
+def findAllLegalMoves(board, chosenPiece, turn):
+    a, b = chosenPiece
+    legalMoves = findLegalMoves(board, chosenPiece, turn)
+    return removeMovesDueToCheck(board, a, b, turn, legalMoves)
 
 def main():
     top, left, squareSize = defineSize()
