@@ -1,6 +1,7 @@
 from pygame.version import PygameVersion
 import pieces
 import sys, pygame
+import copy
 
 pygame.init()
 
@@ -165,9 +166,9 @@ def findLegalMoves(board, chosenPiece, turn):
             #check short castle
             shortCastle = (False, False)
             
-            if board[y][x + 1] == None and board[y][x + 2] == None:
+            if x + 2 < 8 and board[y][x + 1] == None and board[y][x + 2] == None:
                 shortCastle = (True, shortCastle[1])
-            if board[y][x + 3] != None:
+            if x + 3 < 8 and board[y][x + 3] != None:
                 if board[y][x + 3].name == "rook" and board[y][x + 3].castlingAllowed == True:
                     shortCastle = (shortCastle[0], True)
 
@@ -177,9 +178,9 @@ def findLegalMoves(board, chosenPiece, turn):
             ############################################
             #check long castle
             longCastle = (False, False)
-            if board[y][x - 1] == None and board[y][x - 2] == None and board[y][x - 3] == None:
+            if x - 3 > -1 and board[y][x - 1] == None and board[y][x - 2] == None and board[y][x - 3] == None:
                 longCastle = (True, longCastle[1])
-            if board[y][x - 4] != None:
+            if x - 4 > -1 and board[y][x - 4] != None:
                 if board[y][x - 4].name == "rook" and board[y][x - 4].castlingAllowed == True:
                     longCastle = (longCastle[0], True)
             if longCastle == (True, True):
@@ -302,8 +303,42 @@ def drawPromotion(c):
         pygame.display.update()
 
 ###############################################
+
+def castleThroughCheck(board, a, b, legalMoves, turn):
+    print(legalMoves)
+    
+    print(turn)
+    print(board[b][a])
+    if (2, 0) in legalMoves:
+        
+        for add in range(0, 2):
+            virtualBoard = []
+            for q in range(8):
+                virtualBoard.append(list(board[q]))
+            virtualBoard[b][a] = None
+            virtualBoard[b][a + add] = pieces.King(turn)
+            if inCheck(virtualBoard, turn):
+                legalMoves.remove((2, 0))
+                break
+
+    if (-2, 0) in legalMoves:
+        print (legalMoves)
+        for add in range(0, -2, -1):
+            virtualBoard = []
+            for q in range(8):
+                virtualBoard.append(list(board[q]))
+            virtualBoard[b][a] = None
+            virtualBoard[b][a + add] = pieces.King(turn)
+            if inCheck(virtualBoard, turn):
+                legalMoves.remove((-2, 0))
+                break
+
+    return legalMoves
+
 def removeMovesDueToCheck(board, a, b, turn, legalMoves):
     if board[b][a] != None and board[b][a].color == turn:
+        if board[b][a].name == "king" and board[b][a].castlingAllowed == True:
+            legalMoves = castleThroughCheck(board, a, b, legalMoves, turn)
         virtualBoard = []
         lMovesCopy = list(legalMoves)
         for m in lMovesCopy:
