@@ -503,7 +503,7 @@ def main():
                                 target = None
                                 drawBoard(board, turn)
 
-                        elif board[y][x] == None:
+                        elif board[y][x] == None or board[y][x].color != turn:
                             chosenPiece = None
                             target = None
                             drawBoard(board, turn)
