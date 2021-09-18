@@ -529,8 +529,8 @@ def main():
                                                 lMoves.remove(m)
                                         print(lMoves, board[b][a].name, (a, b))
                             if not saved:
-                                print("Checkmate")
-
+                                print("Checkmate ", turn, " loses")
+                        
                         
                 
             elif event.type == pygame.VIDEORESIZE:
