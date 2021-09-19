@@ -529,7 +529,8 @@ def main():
                                                 lMoves.remove(m)
                                         print(lMoves, board[b][a].name, (a, b))
                             if not saved:
-                                print("Checkmate ", turn, " loses")
+                                #TODO: implement option to start new game
+                                print("Checkmate, ", turn, " loses")
                         
                         
                 
