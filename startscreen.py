@@ -38,17 +38,20 @@ def drawMenu():
     text4 = textFont.render("Schachvariante online spielen", True, white)
     texts = [text1, text2, text3, text4]
     maxWidth = text4.get_size()[0]
-    
-    print(text4.get_size())
+
+    image = pygame.image.load("Sprites/chess_position.png")
+    image = pygame.transform.smoothscale(image, (y, y))
+    screen.blit(image, ((x-y)/2, 0))
 
     for a in range(4):
         width = texts[a].get_size()[0]
 
-        button = ((x/2-maxWidth/2-20),(top + squareSize + 2*a*squareSize - heightLetters/2 - 5), maxWidth + 40, heightLetters + 10)
-        pygame.draw.rect(screen, brown, button)
-
-        screen.blit(texts[a], (x/2-width/2, top + squareSize + 2*a*squareSize - heightLetters/2))
-
+        surface = pygame.Surface((maxWidth + 40, heightLetters + 10))
+        surface.fill(brown)
+        surface.blit(texts[a], ((maxWidth-width)/2 + 20, 5))
+        surface.set_alpha(200)
+        screen.blit(surface, (x/2-maxWidth/2 - 20,(top + squareSize + 2*a*squareSize - heightLetters/2 - 5)))
+        
 def chooseVariant(x, y):
     top, left, squareSize = defineSize()
     xVal, yVal = screen.get_size()
