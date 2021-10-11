@@ -472,18 +472,18 @@ def main():
                             
                             pygame.display.update()
                             
-                        if target != None and chosenPiece != None:
+                        if target != None and chosenPiece != None:#check whether you can capture the target piece
                             x, y = target
                             oldX, oldY = chosenPiece
                             diff = (x - oldX, y- oldY)
                         
                             m = findAllLegalMoves(board, chosenPiece, turn)
 
-                            if diff in m:
+                            if diff in m:#capture piece
                                 moveHistory.append(board[oldY][oldX].notation + str(x) + str(8 - y))
                                 notationHistory = moveToNotation(moveHistory, notationHistory)
                                 print(notationHistory)
-                                #add Checks, castling, captures and promotion to notation
+                                #TODO: add Checks, castling, captures and promotion to notation
                                 
                                 if board[oldY][oldX].name == "king" or board[oldY][oldX].name == "rook":
                                     board[oldY][oldX].castlingAllowed = False
@@ -550,9 +550,26 @@ def main():
                                         turn = "black"
                                     else:
                                         turn = "white"
-                                    
-                                    drawBoard(board, turn)
 
+                                    #check for stalemate
+                                    isStalemate = True
+                                    for a in range(8):
+                                        for b in range(8):
+                                            if board[b][a] != None and board[b][a].color == turn:
+                                                if findAllLegalMoves(board, (a, b), turn) != []:
+                                                    isStalemate = False
+                                                    break
+                                    
+                                    #TODO: display stalemate message
+                                    #TODO: change screen only after a click
+                                    if isStalemate:
+                                        inMenu = True
+                                        board = newBoard()
+                                        notationHistory = []
+                                        turn = "white"
+
+                                        print("isStalemate: ", isStalemate)
+                                    drawBoard(board, turn)
                                 else:
                                     target = None
                                     drawBoard(board, turn)
@@ -583,7 +600,8 @@ def main():
                                                     lMoves.remove(m)
                                             print(lMoves, board[b][a].name, (a, b))
                                 if not saved:
-                                    #TODO: implement option to start new game
+                                    #TODO: display winning message
+                                    #TODO: change screen only after a click
                                     
                                     inMenu = True
                                     board = newBoard()
