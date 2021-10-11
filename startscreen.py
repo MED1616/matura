@@ -581,6 +581,12 @@ def main():
                                             print(lMoves, board[b][a].name, (a, b))
                                 if not saved:
                                     #TODO: implement option to start new game
+                                    
+                                    inMenu = True
+                                    board = newBoard()
+                                    notationHistory = []
+                                    turn = "white"
+                                    drawBoard(board, turn)
                                     print("Checkmate, ", turn, " loses")
                         
                         
