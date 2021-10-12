@@ -1,19 +1,17 @@
-from pygame.version import PygameVersion
 import pieces
 import sys, pygame
-import copy
 
 pygame.init()
 
-
 size = [1600, 900]
-
+inMenu = True
 top = size[1]/10
 left = (size[0] - (size[1] - 2*top)) / 2
 squareSize = int((size[1] - 2*top) / 8)
 
 screen = pygame.display.set_mode(size, pygame.RESIZABLE)
 color = (0, 0, 0)
+white = (255, 255, 255)
 screen.fill(color)
 
 brown = (153, 102, 51)
@@ -26,27 +24,72 @@ def defineSize():
     squareSize = int((size[1] - 2*top) / 8)
     return int(top), int(left), int(squareSize)
 
-def drawBoard(board, turn):
+def drawMenu():
     top, left, squareSize = defineSize()
-    
     screen.fill(color)
+    x, y = screen.get_size()
+    heightLetters = 35
+    textFont = pygame.font.SysFont("calibri", heightLetters, True)
 
-    for a in range(8):
-        for b in range(8):
-            
-            if (a + b) % 2 == 1:
-                square = ((left + a * squareSize), (top + b * squareSize), squareSize, squareSize)
-                pygame.draw.rect(screen, brown, square)
-                
-                
-            else:
-                square = ((left + a * squareSize), (top + b * squareSize), squareSize, squareSize)
-                pygame.draw.rect(screen, lightBrown, square)
-                
-    if inCheck(board, turn):
-        drawCheck(board, turn)
+    text1 = textFont.render("Schach lokal spielen", True, white)
+    text2 = textFont.render("Schach online spielen", True, white)
+
+    text3 = textFont.render("Schachvariante lokal spielen", True, white)
+    text4 = textFont.render("Schachvariante online spielen", True, white)
+    texts = [text1, text2, text3, text4]
+    maxWidth = text4.get_size()[0]
+
+    image = pygame.image.load("Sprites/chess_position.png")
+    image = pygame.transform.smoothscale(image, (y, y))
+    screen.blit(image, ((x-y)/2, 0))
+
+    for a in range(4):
+        width = texts[a].get_size()[0]
+
+        surface = pygame.Surface((maxWidth + 40, heightLetters + 10))
+        surface.fill(brown)
+        surface.blit(texts[a], ((maxWidth-width)/2 + 20, 5))
+        surface.set_alpha(200)
+        screen.blit(surface, (x/2-maxWidth/2 - 20,(top + squareSize + 2*a*squareSize - heightLetters/2 - 5)))
+        
+def chooseVariant(x, y):
+    top, left, squareSize = defineSize()
+    xVal, yVal = screen.get_size()
+    if x > xVal/2 - 239 and x < xVal/2 + 239:
+        if y > top + squareSize - 35/2 - 5 and y < top + squareSize - 35/2 - 5 + 45:  
+            return 0
+        elif y > top + squareSize + 2*squareSize - 35/2 - 5 and y < top + squareSize + 2*squareSize - 35/2 - 5 + 45:
+            return 1
+        elif y > top + squareSize + 4*squareSize - 35/2 - 5 and y < top + squareSize + 4*squareSize - 35/2 - 5 + 45:
+            return 2
+        elif y > top + squareSize + 6*squareSize - 35/2 - 5 and y < top + squareSize + 6*squareSize - 35/2 - 5 + 45:
+            return 3
+
+def drawBoard(board, turn):
+    if inMenu:
+        drawMenu()
     else:
-        drawPieces(board)
+        top, left, squareSize = defineSize()
+        
+        screen.fill(color)
+
+        for a in range(8):
+            for b in range(8):
+                
+                if (a + b) % 2 == 1:
+                    square = ((left + a * squareSize), (top + b * squareSize), squareSize, squareSize)
+                    pygame.draw.rect(screen, brown, square)
+                    
+                    
+                else:
+                    square = ((left + a * squareSize), (top + b * squareSize), squareSize, squareSize)
+                    pygame.draw.rect(screen, lightBrown, square)
+                    
+        if inCheck(board, turn):
+            drawCheck(board, turn)
+        else:
+            drawPieces(board)
+
     pygame.display.update()
 
 
@@ -227,9 +270,7 @@ def getPawnPromotion(x, y):
     y = int((y - heigth/2 + squareSize/2)/squareSize)
 
     if y == 0:
-        
         if x == 0:
-            
             return "queen"
         elif x == 1:
             return "rook"
@@ -368,7 +409,10 @@ def variant(board, target, turn):
     elif board[y][x].name == "knight": 
         board[y][x] = pieces.Knight(turn)
 
+
 def main():
+    global inMenu
+    chosenVariant = 0
     top, left, squareSize = defineSize()
     turn = "white"
     chosenPiece = None
@@ -380,157 +424,188 @@ def main():
     
     board = newBoard()
     drawBoard(board, turn)
-
+    
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT: 
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0] == True:
-                top, left, squareSize = defineSize()
-                pos = pygame.mouse.get_pos()
-                x, y = pos
-                
-                if  left + 8*squareSize > x > left and top + 8*squareSize > y > top:
-                    x, y = findClickedSquare(pos)
-
-                    
-
-                    if board[y][x] != None:
-                        if board[y][x].color == turn:
-                            chosenPiece = x, y
-                    if chosenPiece != None and board[y][x] != None:
-                        if board[y][x].color != turn:
-                            target = x, y
-                    elif chosenPiece != None and board[y][x] == None:
-                            target = x, y
-
-                    if chosenPiece != None:
-                        x, y = chosenPiece
+                if inMenu:
+                    pos = pygame.mouse.get_pos()
+                    print(pos)
+                    x, y = pos
+                    if chooseVariant(x, y) == 0 or chooseVariant(x, y) == 2:
+                        inMenu = False
+                        chosenVariant = chooseVariant(x, y)
+                        screen.fill(color)
                         drawBoard(board, turn)
-        
-                        drawLegalMoves(board, chosenPiece, turn)
-                        
-                        
-                        drawChosenPiece(board, x, y)
+                else:
+                    top, left, squareSize = defineSize()
+                    pos = pygame.mouse.get_pos()
+                    x, y = pos
+                    
+                    if  left + 8*squareSize > x > left and top + 8*squareSize > y > top:
+                        x, y = findClickedSquare(pos)
 
-                        if inCheck(board, turn):
-                            drawCheck(board, turn)
                         
-                        pygame.display.update()
-                        
-                    if target != None and chosenPiece != None:
-                        x, y = target
-                        oldX, oldY = chosenPiece
-                        diff = (x - oldX, y- oldY)
-                       
-                        m = findAllLegalMoves(board, chosenPiece, turn)
 
-                        if diff in m:
-                            moveHistory.append(board[oldY][oldX].notation + str(x) + str(8 - y))
-                            notationHistory = moveToNotation(moveHistory, notationHistory)
-                            print(notationHistory)
-                            #add Checks, castling, captures and promotion to notation
+                        if board[y][x] != None:
+                            if board[y][x].color == turn:
+                                chosenPiece = x, y
+                        if chosenPiece != None and board[y][x] != None:
+                            if board[y][x].color != turn:
+                                target = x, y
+                        elif chosenPiece != None and board[y][x] == None:
+                                target = x, y
+
+                        if chosenPiece != None:
+                            x, y = chosenPiece
+
+                            drawBoard(board, turn)
+                            drawChosenPiece(board, x, y)
+                            drawLegalMoves(board, chosenPiece, turn)
                             
-                            if board[oldY][oldX].name == "king" or board[oldY][oldX].name == "rook":
-                                board[oldY][oldX].castlingAllowed = False
+                            pygame.display.update()
                             
-                            if board[oldY][oldX].name == "king" and diff == (2, 0):
-                                #move rook for short castling
-                                board[oldY][oldX + 1] = board[oldY][oldX + 3]
-                                board[oldY][oldX + 3] = None
-                            elif board[oldY][oldX].name == "king" and diff == (-2, 0):
-                                #move rook for long castling
-                                board[oldY][oldX - 1] = board[oldY][oldX - 4]
-                                board[oldY][oldX - 4] = None
+                        if target != None and chosenPiece != None:#check whether you can capture the target piece
+                            x, y = target
+                            oldX, oldY = chosenPiece
+                            diff = (x - oldX, y- oldY)
+                        
+                            m = findAllLegalMoves(board, chosenPiece, turn)
 
-                            #########################################
-                            #promotion
-                            undidMove = False #for control later on
-                            if board[oldY][oldX].name == "pawn" and (y == 7 or y == 0):
+                            if diff in m:#capture piece
+                                moveHistory.append(board[oldY][oldX].notation + str(x) + str(8 - y))
+                                notationHistory = moveToNotation(moveHistory, notationHistory)
+                                print(notationHistory)
+                                #TODO: add Checks, castling, captures and promotion to notation
+                                
+                                if board[oldY][oldX].name == "king" or board[oldY][oldX].name == "rook":
+                                    board[oldY][oldX].castlingAllowed = False
+                                
+                                if board[oldY][oldX].name == "king" and diff == (2, 0):
+                                    #move rook for short castling
+                                    board[oldY][oldX + 1] = board[oldY][oldX + 3]
+                                    board[oldY][oldX + 3] = None
+                                elif board[oldY][oldX].name == "king" and diff == (-2, 0):
+                                    #move rook for long castling
+                                    board[oldY][oldX - 1] = board[oldY][oldX - 4]
+                                    board[oldY][oldX - 4] = None
+
+                                #########################################
                                 #promotion
-                                drawPromotion(board[oldY][oldX].color)
+                                undidMove = False #for control later on
+                                if board[oldY][oldX].name == "pawn" and (y == 7 or y == 0):
+                                    #promotion
+                                    drawPromotion(board[oldY][oldX].color)
 
-                                if inCheck(board, turn):
-                                    drawCheck(board, turn)
-                                #pygame.display.update()
+                                    if inCheck(board, turn):
+                                        drawCheck(board, turn)
+                                    #pygame.display.update()
 
-                                promoteTo = None
+                                    promoteTo = None
+                                    
+
+                                    while promoteTo != "queen" and promoteTo != "rook" and promoteTo != "knight" and promoteTo != "bishop" and promoteTo != 0:
+                                        for event in pygame.event.get():
+                                            if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0] == True:
+                                                x1, y1 = pygame.mouse.get_pos()
+                                                promoteTo = getPawnPromotion(x1, y1)
+                                            ###########################    
+                                            elif event.type == pygame.VIDEORESIZE:
+                                                drawPromotion(board[oldY][oldX].color)
+                                            ###########################
+                                            elif event.type == pygame.QUIT: 
+                                                sys.exit()
+
+                                    if promoteTo == "queen": 
+                                        board[oldY][oldX] = pieces.Queen(turn)
+                                    elif promoteTo == "rook": 
+                                        board[oldY][oldX] = pieces.Rook(turn)
+                                    elif promoteTo == "bishop": 
+                                        board[oldY][oldX] = pieces.Bishop(turn)
+                                    elif promoteTo == "knight": 
+                                        board[oldY][oldX] = pieces.Knight(turn)
+                                    else:
+                                        undidMove = True
+                                #######################################################
                                 
+                                if undidMove == False: #if not promoted
+                                    #variant
+                                    if board[oldY][oldX].name == "pawn" and board[target[1]][target[0]] != None and board[target[1]][target[0]].name != "pawn" and chosenVariant == 2:
+                                        variant(board, target, turn)
+                                    else:
+                                        board[y][x] = board[oldY][oldX]
+                                    
+                                    board[oldY][oldX] = None
+                                    chosenPiece = None
+                                    target = None
 
-                                while promoteTo != "queen" and promoteTo != "rook" and promoteTo != "knight" and promoteTo != "bishop" and promoteTo != 0:
-                                    for event in pygame.event.get():
-                                        if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0] == True:
-                                            x1, y1 = pygame.mouse.get_pos()
-                                            promoteTo = getPawnPromotion(x1, y1)
-                                        ###########################    
-                                        elif event.type == pygame.VIDEORESIZE:
-                                            drawPromotion(board[oldY][oldX].color)
-                                        ###########################
-                                        elif event.type == pygame.QUIT: 
-                                            sys.exit()
+                                    if turn == "white":
+                                        turn = "black"
+                                    else:
+                                        turn = "white"
 
-                                if promoteTo == "queen": 
-                                    board[oldY][oldX] = pieces.Queen(turn)
-                                elif promoteTo == "rook": 
-                                    board[oldY][oldX] = pieces.Rook(turn)
-                                elif promoteTo == "bishop": 
-                                    board[oldY][oldX] = pieces.Bishop(turn)
-                                elif promoteTo == "knight": 
-                                    board[oldY][oldX] = pieces.Knight(turn)
+                                    #check for stalemate
+                                    isStalemate = True
+                                    for a in range(8):
+                                        for b in range(8):
+                                            if board[b][a] != None and board[b][a].color == turn:
+                                                if findAllLegalMoves(board, (a, b), turn) != []:
+                                                    isStalemate = False
+                                                    break
+                                    if inCheck(board, turn):
+                                        isStalemate = False
+                                    #TODO: display stalemate message
+                                    #TODO: change screen only after a click
+                                    if isStalemate:
+                                        inMenu = True
+                                        board = newBoard()
+                                        notationHistory = []
+                                        turn = "white"
+
+                                        print("isStalemate: ", isStalemate)
+                                    drawBoard(board, turn)
                                 else:
-                                    undidMove = True
-                            #######################################################
-                            
-                            if undidMove == False: #if not promoted
-                                #variant
-                                if board[oldY][oldX].name == "pawn" and board[target[1]][target[0]] != None and board[target[1]][target[0]].name != "pawn":
-                                    variant(board, target, turn)
-                                else:
-                                    board[y][x] = board[oldY][oldX]
-                                
-                                board[oldY][oldX] = None
+                                    target = None
+                                    drawBoard(board, turn)
+
+                            elif board[y][x] == None or board[y][x].color != turn:
                                 chosenPiece = None
                                 target = None
-
-                                if turn == "white":
-                                    turn = "black"
-                                else:
-                                    turn = "white"
-                                
                                 drawBoard(board, turn)
 
-                            else:
-                                target = None
-                                drawBoard(board, turn)
+                            if inCheck(board, turn):
 
-                        elif board[y][x] == None or board[y][x].color != turn:
-                            chosenPiece = None
-                            target = None
-                            drawBoard(board, turn)
-
-                        if inCheck(board, turn):
-
-                            saved = False
-                            for b in range(8):
-                                for a in range(8):
-                                    if board[b][a] != None and board[b][a].color == turn:
-                                        lMoves = findLegalMoves(board, (a, b), turn)
-                                        virtualBoard = []
-                                        lMovesCopy = list(lMoves)
-                                        for m in lMovesCopy:
+                                saved = False
+                                for b in range(8):
+                                    for a in range(8):
+                                        if board[b][a] != None and board[b][a].color == turn:
+                                            lMoves = findLegalMoves(board, (a, b), turn)
                                             virtualBoard = []
-                                            for q in range(8):
-                                                virtualBoard.append(list(board[q]))
-                                            virtualBoard[b + m[1]][a + m[0]] = virtualBoard[b][a]
-                                            virtualBoard[b][a] = None
-                                            if not inCheck(virtualBoard, turn):
-                                                saved = True
-                                            else:
-                                                lMoves.remove(m)
-                                        print(lMoves, board[b][a].name, (a, b))
-                            if not saved:
-                                #TODO: implement option to start new game
-                                print("Checkmate, ", turn, " loses")
+                                            lMovesCopy = list(lMoves)
+                                            for m in lMovesCopy:
+                                                virtualBoard = []
+                                                for q in range(8):
+                                                    virtualBoard.append(list(board[q]))
+                                                virtualBoard[b + m[1]][a + m[0]] = virtualBoard[b][a]
+                                                virtualBoard[b][a] = None
+                                                if not inCheck(virtualBoard, turn):
+                                                    saved = True
+                                                else:
+                                                    lMoves.remove(m)
+                                            print(lMoves, board[b][a].name, (a, b))
+                                            
+                                if not saved:
+                                    #TODO: display winning message
+                                    #TODO: change screen only after a click
+                                    
+                                    inMenu = True
+                                    board = newBoard()
+                                    notationHistory = []
+                                    turn = "white"
+                                    drawBoard(board, turn)
+                                    print("Checkmate, ", turn, " loses")
                         
                         
                 

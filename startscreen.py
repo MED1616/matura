@@ -460,11 +460,10 @@ def main():
 
                         if chosenPiece != None:
                             x, y = chosenPiece
-                            
+
                             drawBoard(board, turn)
                             drawChosenPiece(board, x, y)
                             drawLegalMoves(board, chosenPiece, turn)
-                            
                             
                             pygame.display.update()
                             
@@ -555,7 +554,8 @@ def main():
                                                 if findAllLegalMoves(board, (a, b), turn) != []:
                                                     isStalemate = False
                                                     break
-                                    
+                                    if inCheck(board, turn):
+                                        isStalemate = False
                                     #TODO: display stalemate message
                                     #TODO: change screen only after a click
                                     if isStalemate:
@@ -595,6 +595,7 @@ def main():
                                                 else:
                                                     lMoves.remove(m)
                                             print(lMoves, board[b][a].name, (a, b))
+                                            
                                 if not saved:
                                     #TODO: display winning message
                                     #TODO: change screen only after a click
