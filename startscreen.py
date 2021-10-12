@@ -460,15 +460,11 @@ def main():
 
                         if chosenPiece != None:
                             x, y = chosenPiece
+                            
                             drawBoard(board, turn)
-            
+                            drawChosenPiece(board, x, y)
                             drawLegalMoves(board, chosenPiece, turn)
                             
-                            
-                            drawChosenPiece(board, x, y)
-
-                            if inCheck(board, turn):
-                                drawCheck(board, turn)
                             
                             pygame.display.update()
                             
