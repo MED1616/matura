@@ -540,6 +540,7 @@ def main():
                 clientsocket.close()
                 #board = msg
                 turn = playerColor
+                drawBoard(board, turn)
                 
         for event in pygame.event.get():
             if event.type == pygame.QUIT: 
