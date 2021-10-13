@@ -1,7 +1,6 @@
 import pieces
 import sys, pygame
 import socket, pickle
-import time
 
 pygame.init()
 
@@ -543,8 +542,25 @@ def main():
                             playerColor = 'black'
                         print(opponentIP)
                         inMenu = False
+                        drawBoard(board, turn)
+                        
                 elif (chosenVariant == 1 or chosenVariant == 3) and playerColor != turn and playerColor != 'both':
-                    return True
+                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    s.bind((socket.gethostname(), 4444))#(IP, Port)
+                    s.listen(5) #queue size
+                    print(socket.gethostname())
+                    print(socket.gethostbyname(socket.gethostname()))
+                    msg = None
+                    while msg == None:
+                        clientsocket, address = s.accept()
+                        print(f"Connection from {address} has been established")
+
+                        data = clientsocket.recv(1024)
+                        msg = pickle.loads(data)
+                        print(msg)
+                        clientsocket.close()
+                    board = msg
+                    turn = playerColor
 
                 else:
                     top, left, squareSize = defineSize()
@@ -576,7 +592,7 @@ def main():
                         if target != None and chosenPiece != None:#check whether you can capture the target piece
                             x, y = target
                             oldX, oldY = chosenPiece
-                            diff = (x - oldX, y- oldY)
+                            diff = (x - oldX, y - oldY)
                         
                             m = findAllLegalMoves(board, chosenPiece, turn)
 
@@ -638,7 +654,7 @@ def main():
                                 
                                 if undidMove == False: #if not promoted
                                     #variant
-                                    if board[oldY][oldX].name == "pawn" and board[target[1]][target[0]] != None and board[target[1]][target[0]].name != "pawn" and chosenVariant == 2:
+                                    if board[oldY][oldX].name == "pawn" and board[target[1]][target[0]] != None and board[target[1]][target[0]].name != "pawn" and (chosenVariant == 2 or chosenVariant == 3):
                                         variant(board, target, turn)
                                     else:
                                         board[y][x] = board[oldY][oldX]
@@ -651,6 +667,15 @@ def main():
                                         turn = "black"
                                     else:
                                         turn = "white"
+
+                                    if chosenVariant == 1 or chosenVariant == 3:
+                                        #send new board to opponent
+                                        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                                        s.connect((opponentIP, 4444))#(IP, Port)
+
+                                        msg = pickle.dumps(board)
+
+                                        s.send(msg)
 
                                     #check for stalemate
                                     isStalemate = True
@@ -702,7 +727,6 @@ def main():
                                 drawBoard(board, turn)
 
                             if inCheck(board, turn):
-
                                 saved = False
                                 for b in range(8):
                                     for a in range(8):
@@ -723,8 +747,6 @@ def main():
                                             print(lMoves, board[b][a].name, (a, b))
                                             
                                 if not saved:
-                                    
-                                    
                                     if turn == 'white':
                                         winner = 'black'
                                     else:
