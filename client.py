@@ -2,9 +2,9 @@ import socket
 import pickle
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect((socket.gethostname(), 4444))#(IP, Port), need to change IP after testing when not on same PC
+s.connect(('192.168.0.110', 4444))#(IP, Port), need to change IP after testing when not on same PC
 
-l = [1, 2, 3]
+l = [1, 2, 3, 'moin timon du idiot']
 msg = pickle.dumps(l)
 
 s.send(msg)
