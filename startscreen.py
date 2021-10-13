@@ -528,12 +528,16 @@ def main():
             while msg == None:
                 clientsocket, address = s.accept()
                 print(f"Connection from {address} has been established")
+                for x in range(8):
+                    for y in range(8):
 
-                data = clientsocket.recv(10024)
-                msg = pickle.loads(data)
-                print(msg)
+                        data = clientsocket.recv(1024)
+                        msg = pickle.loads(data)
+                        print(msg)
+                        board[y][x] = msg
+
                 clientsocket.close()
-                board = msg
+                #board = msg
                 turn = playerColor
                 
         for event in pygame.event.get():
@@ -562,7 +566,7 @@ def main():
                         print(opponentIP)
                         inMenu = False
                         drawBoard(board, turn)
-                        
+                    """
                 elif (chosenVariant == 1 or chosenVariant == 3) and playerColor != turn and playerColor != 'both':
                     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     s.bind((socket.gethostname(), 4444))#(IP, Port)
@@ -574,13 +578,13 @@ def main():
                         clientsocket, address = s.accept()
                         print(f"Connection from {address} has been established")
 
-                        data = clientsocket.recv(10024)
+                        data = clientsocket.recv(1024)
                         msg = pickle.loads(data)
                         print(msg)
                         clientsocket.close()
                     board = msg
                     turn = playerColor
-
+                    """
                 else:
                     top, left, squareSize = defineSize()
                     pos = pygame.mouse.get_pos()
@@ -691,10 +695,10 @@ def main():
                                         #send new board to opponent
                                         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                                         s.connect((opponentIP, 4444))#(IP, Port)
-
-                                        msg = pickle.dumps(board)
-
-                                        s.send(msg)
+                                        for row in board:
+                                            for val in row:
+                                                msg = pickle.dumps(val)
+                                                s.send(msg)
 
                                     #check for stalemate
                                     isStalemate = True
