@@ -1,6 +1,7 @@
 import pieces
 import sys, pygame
 import socket, pickle
+import time
 
 pygame.init()
 
@@ -503,6 +504,7 @@ def hostGame():
     
 def main():
     global inMenu
+    playerColor = 'both'
     chosenVariant = 0
     top, left, squareSize = defineSize()
     turn = "white"
@@ -527,6 +529,7 @@ def main():
                     print(pos)
                     x, y = pos
                     if chooseVariant(x, y) == 0 or chooseVariant(x, y) == 2:
+                        playerColor = 'both'
                         inMenu = False
                         chosenVariant = chooseVariant(x, y)
                         screen.fill(color)
@@ -534,9 +537,14 @@ def main():
                     elif chooseVariant(x, y) == 1 or chooseVariant(x, y) == 3:
                         opponentIP = inputField()
                         if opponentIP == True:
-                            hostGame()
+                            playerColor = 'white'
+                            opponentIP = ''
+                        else:
+                            playerColor = 'black'
                         print(opponentIP)
                         inMenu = False
+                elif (chosenVariant == 1 or chosenVariant == 3) and playerColor != turn and playerColor != 'both':
+                    return True
 
                 else:
                     top, left, squareSize = defineSize()
@@ -546,7 +554,6 @@ def main():
                     if  left + 8*squareSize > x > left and top + 8*squareSize > y > top:
                         x, y = findClickedSquare(pos)
 
-                        
 
                         if board[y][x] != None:
                             if board[y][x].color == turn:
@@ -655,11 +662,31 @@ def main():
                                                     break
                                     if inCheck(board, turn):
                                         isStalemate = False
-                                    #TODO: display stalemate message
-                                    #TODO: change screen only after a click
+                                    
+
                                     if isStalemate:
+                                        drawBoard(board, turn)
+                                        msg = f'Stalemate'
+                                        textFont = pygame.font.SysFont("calibri", 50, True)
+                                        winMsg = textFont.render(msg, True, white)
+
+                                        wid = winMsg.get_size()[0]
+
+                                        surf = pygame.Surface((wid + 20, 70))
+                                        surf.fill(brown)
+                                        surf.set_alpha(200)
+                                        size = screen.get_size()
+                                        surf.blit(winMsg, (10, 10))
+                                        screen.blit(surf, (size[0]/2 - wid/2 - 10, size[1]/2 - 35))
+                                        pygame.display.update()
+                                        pressedEscape = False
+                                        while pressedEscape == False:
+                                            for event2 in pygame.event.get():
+                                                if event2.type == pygame.KEYDOWN and event2.key == pygame.K_RETURN:
+                                                    pressedEscape = True
                                         inMenu = True
                                         board = newBoard()
+                                        moveHistory = []
                                         notationHistory = []
                                         turn = "white"
 
@@ -696,13 +723,36 @@ def main():
                                             print(lMoves, board[b][a].name, (a, b))
                                             
                                 if not saved:
-                                    #TODO: display winning message
-                                    #TODO: change screen only after a click
                                     
+                                    
+                                    if turn == 'white':
+                                        winner = 'black'
+                                    else:
+                                        winner = 'white'
+
+                                    msg = f'Checkmate, {winner} won'
+                                    textFont = pygame.font.SysFont("calibri", 50, True)
+                                    winMsg = textFont.render(msg, True, white)
+
+                                    wid = winMsg.get_size()[0]
+
+                                    surf = pygame.Surface((wid + 20, 70))
+                                    surf.fill(brown)
+                                    surf.set_alpha(200)
+                                    size = screen.get_size()
+                                    surf.blit(winMsg, (10, 10))
+                                    screen.blit(surf, (size[0]/2 - wid/2 - 10, size[1]/2 - 35))
+                                    pygame.display.update()
+                                    pressedEscape = False
+                                    while pressedEscape == False:
+                                        for event2 in pygame.event.get():
+                                            if event2.type == pygame.KEYDOWN and event2.key == pygame.K_RETURN:
+                                                pressedEscape = True
+                                        
                                     inMenu = True
                                     board = newBoard()
+                                    moveHistory = []
                                     notationHistory = []
-                                    turn = "white"
                                     drawBoard(board, turn)
                                     print("Checkmate, ", turn, " loses")
                         
