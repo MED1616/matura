@@ -456,7 +456,7 @@ def inputField():
     left = (screen.get_size()[0] - w)/2
     top = (screen.get_size()[1] - h)/2 + 10
     inputField = pygame.Rect(left, top, w, h)
-    clicked = False
+    clicked = True
     inputFinished = False
     opponent_ip = ''
     dimension = 700, 100,  x/2 - w/2, (2*y)/3 - h/2
@@ -522,7 +522,7 @@ def main():
     while True:
         if (chosenVariant == 1 or chosenVariant == 3) and playerColor != turn and playerColor != 'both':
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.bind((socket.gethostname(), 4444))#(IP, Port)
+            s.bind((socket.gethostname(), 4949))#(IP, Port)
             s.listen(5) #queue size
             print(socket.gethostname())
             print(socket.gethostbyname(socket.gethostname()))
@@ -530,13 +530,12 @@ def main():
             while msg == None:
                 clientsocket, address = s.accept()
                 print(f"Connection from {address} has been established")
-                for x in range(8):
-                    for y in range(8):
 
-                        data = clientsocket.recv(1024)
-                        msg = pickle.loads(data)
-                        print(msg)
-                        board[y][x] = msg
+                data = clientsocket.recv(5096)
+                print(data)
+                msg = pickle.loads(data)
+                print(msg)
+                board = msg
 
                 clientsocket.close()
                 #board = msg
@@ -571,7 +570,7 @@ def main():
                     """
                 elif (chosenVariant == 1 or chosenVariant == 3) and playerColor != turn and playerColor != 'both':
                     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    s.bind((socket.gethostname(), 4444))#(IP, Port)
+                    s.bind((socket.gethostname(), 4949))#(IP, Port)
                     s.listen(5) #queue size
                     print(socket.gethostname())
                     print(socket.gethostbyname(socket.gethostname()))
@@ -696,12 +695,11 @@ def main():
                                     if chosenVariant == 1 or chosenVariant == 3:
                                         #send new board to opponent
                                         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                                        s.connect((opponentIP, 4444))#(IP, Port)
-                                        for row in board:
-                                            for val in row:
-                                                msg = pickle.dumps(val)
-                                                print(len(msg))
-                                                s.send(msg)
+                                        s.connect((opponentIP, 4949))#(IP, Port)
+                                        
+                                        msg = pickle.dumps(board)
+                                        print(len(msg))
+                                        s.send(msg)
 
                                     #check for stalemate
                                     isStalemate = True
