@@ -518,6 +518,24 @@ def main():
     drawBoard(board, turn)
     
     while True:
+        if (chosenVariant == 1 or chosenVariant == 3) and playerColor != turn and playerColor != 'both':
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.bind((socket.gethostname(), 4444))#(IP, Port)
+            s.listen(5) #queue size
+            print(socket.gethostname())
+            print(socket.gethostbyname(socket.gethostname()))
+            msg = None
+            while msg == None:
+                clientsocket, address = s.accept()
+                print(f"Connection from {address} has been established")
+
+                data = clientsocket.recv(1024)
+                msg = pickle.loads(data)
+                print(msg)
+                clientsocket.close()
+                board = msg
+                turn = playerColor
+                
         for event in pygame.event.get():
             if event.type == pygame.QUIT: 
                 sys.exit()
@@ -536,10 +554,10 @@ def main():
                     elif chooseVariant(x, y) == 1 or chooseVariant(x, y) == 3:
                         opponentIP = inputField()
                         if opponentIP == True:
-                            playerColor = 'white'
+                            playerColor = 'black'
                             opponentIP = ''
                         else:
-                            playerColor = 'black'
+                            playerColor = 'white'
                         print(opponentIP)
                         inMenu = False
                         drawBoard(board, turn)
