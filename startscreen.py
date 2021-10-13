@@ -529,7 +529,7 @@ def main():
                 clientsocket, address = s.accept()
                 print(f"Connection from {address} has been established")
 
-                data = clientsocket.recv(1024)
+                data = clientsocket.recv(10024)
                 msg = pickle.loads(data)
                 print(msg)
                 clientsocket.close()
@@ -552,6 +552,7 @@ def main():
                         screen.fill(color)
                         drawBoard(board, turn)
                     elif chooseVariant(x, y) == 1 or chooseVariant(x, y) == 3:
+                        chosenVariant = chooseVariant(x, y)
                         opponentIP = inputField()
                         if opponentIP == True:
                             playerColor = 'black'
@@ -573,7 +574,7 @@ def main():
                         clientsocket, address = s.accept()
                         print(f"Connection from {address} has been established")
 
-                        data = clientsocket.recv(1024)
+                        data = clientsocket.recv(10024)
                         msg = pickle.loads(data)
                         print(msg)
                         clientsocket.close()
