@@ -126,7 +126,8 @@ def drawPieces(board):
             
             if board[b][a] != None:
                 coord = ((left + squareSize * a), (top + squareSize * b))
-                image = pygame.transform.smoothscale(board[b][a].sprite, (squareSize, squareSize))
+                spriteOfPiece = pygame.image.load(board[b][a].sprite)
+                image = pygame.transform.smoothscale(spriteOfPiece, (squareSize, squareSize))
                 screen.blit(image, coord)
     pygame.display.update()
 
@@ -137,7 +138,8 @@ def drawChosenPiece(board, x, y):
     pygame.draw.rect(screen, (0, 200, 0 ), square)
 
     coord = ((left + squareSize * x), (top + squareSize * y))
-    image = pygame.transform.smoothscale(board[y][x].sprite, (squareSize, squareSize))
+    spriteOfPiece = pygame.image.load(board[y][x].sprite)
+    image = pygame.transform.smoothscale(spriteOfPiece, (squareSize, squareSize))
     screen.blit(image, coord)
     pygame.display.update()
 
@@ -698,6 +700,7 @@ def main():
                                         for row in board:
                                             for val in row:
                                                 msg = pickle.dumps(val)
+                                                print(len(msg))
                                                 s.send(msg)
 
                                     #check for stalemate

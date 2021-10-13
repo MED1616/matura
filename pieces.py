@@ -5,7 +5,7 @@ class Piece:
         self.color = color
         self.name = name
         self.notation = notation
-        self.sprite = pygame.image.load("Sprites/" + color + "_" + name + ".png")
+        self.sprite = str("Sprites/" + color + "_" + name + ".png")
     
 
 class King(Piece):
