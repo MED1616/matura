@@ -524,11 +524,11 @@ def main():
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.bind((socket.gethostname(), 4949))#(IP, Port)
             s.listen(5) #queue size
-            print(socket.gethostname())
-            print(socket.gethostbyname(socket.gethostname()))
+            
             msg = None
             while msg == None:
                 clientsocket, address = s.accept()
+                opponentIP = clientsocket
                 print(f"Connection from {address} has been established")
 
                 data = clientsocket.recv(5096)
