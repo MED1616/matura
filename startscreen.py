@@ -528,13 +528,13 @@ def main():
             msg = None
             while msg == None:
                 clientsocket, address = s.accept()
-                opponentIP = clientsocket
+                opponentIP = address[0]
                 print(f"Connection from {address} has been established")
 
                 data = clientsocket.recv(5096)
-                print(data)
+                
                 msg = pickle.loads(data)
-                print(msg)
+                
                 board = msg
 
                 clientsocket.close()
