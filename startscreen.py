@@ -1,5 +1,6 @@
 import pieces
 import sys, pygame
+import socket, pickle
 
 pygame.init()
 
@@ -409,7 +410,97 @@ def variant(board, target, turn):
     elif board[y][x].name == "knight": 
         board[y][x] = pieces.Knight(turn)
 
+def displayIP():
+    heightLetters = 35
+    x, y = screen.get_size()
 
+    textFont = pygame.font.SysFont("calibri", heightLetters, True)
+    self_ip = str(socket.gethostbyname(socket.gethostname()))
+    self_ip = f"your IP: {self_ip}"
+    text_ip = textFont.render(self_ip, True, white)
+
+    w, h = text_ip.get_size()
+
+    surface = pygame.Surface((w + 40, h + 10))
+    surface.fill(brown)
+    surface.blit(text_ip, (20, 5))
+    surface.set_alpha(200)
+
+    screen.blit(surface, (x/2-w/2-20, y/3- h/2 - 5))
+
+    #host menu button
+    w, h = 700, 100
+    l, t = x/2 - w/2, (2*y)/3 - h/2
+    
+    button = pygame.Rect(l, t, w, h)
+    text1 = 'Host Game'  #160, 35
+    text2 = 'You dont need to enter an IP to host a Game' #650, 35
+    textButton1 = textFont.render(text1, True, white)
+    textButton2 = textFont.render(text2, True, white)
+
+    surface = pygame.Surface((w, h))
+    surface.fill(color)
+    surface.blit(textButton1, (700/2 - 160/2 ,10))
+    surface.blit(textButton2, (700/2 - 650/2 ,10 + 35 + 10))
+    surface.set_alpha(200)
+
+    screen.blit(surface, (l, t))
+    #give l, t, w, h to inputField
+
+def inputField():
+    x, y = screen.get_size()
+    textFont = pygame.font.SysFont("calibri", 35, True)
+    w, h = 500, 50
+    left = (screen.get_size()[0] - w)/2
+    top = (screen.get_size()[1] - h)/2 + 10
+    inputField = pygame.Rect(left, top, w, h)
+    clicked = False
+    inputFinished = False
+    opponent_ip = ''
+    dimension = 700, 100,  x/2 - w/2, (2*y)/3 - h/2
+    button = pygame.Rect(dimension[0], dimension[1], dimension[2], dimension[3])
+
+    while not inputFinished:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0] == True:
+                x, y = pygame.mouse.get_pos()
+                if inputField.collidepoint((x, y)):
+                    clicked = True
+                elif button.collidepoint(x, y):
+                    hosting = True
+                    return hosting
+                else:
+                    clicked = False
+            elif event.type == pygame.KEYDOWN:
+                if clicked:
+                    if event.key == pygame.K_RETURN:
+                        return opponent_ip
+                    elif event.key == pygame.K_BACKSPACE:
+                        opponent_ip = opponent_ip[:-1]
+                    else:
+                        opponent_ip += event.unicode
+
+        x, y = screen.get_size()
+        screen.fill((0,0,0))
+        image = pygame.image.load("Sprites/chess_position.png")
+        image = pygame.transform.smoothscale(image, (y, y))
+        screen.blit(image, ((x-y)/2, 0))
+        
+        displayIP()
+
+        inputF = textFont.render(opponent_ip, True, color)
+        if inputF.get_size()[0] + 15 > w:
+            w = inputF.get_size()[0] + 15
+            inputField = pygame.Rect(left, top, w, h)
+        screen.blit(inputF, (left + 10, top + 7))
+        pygame.draw.rect(screen, color, inputField, 5)
+        pygame.display.update()
+
+def hostGame():
+    return True
+    
 def main():
     global inMenu
     chosenVariant = 0
@@ -430,6 +521,7 @@ def main():
             if event.type == pygame.QUIT: 
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0] == True:
+
                 if inMenu:
                     pos = pygame.mouse.get_pos()
                     print(pos)
@@ -439,6 +531,13 @@ def main():
                         chosenVariant = chooseVariant(x, y)
                         screen.fill(color)
                         drawBoard(board, turn)
+                    elif chooseVariant(x, y) == 1 or chooseVariant(x, y) == 3:
+                        opponentIP = inputField()
+                        if opponentIP == True:
+                            hostGame()
+                        print(opponentIP)
+                        inMenu = False
+
                 else:
                     top, left, squareSize = defineSize()
                     pos = pygame.mouse.get_pos()
