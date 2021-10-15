@@ -5,10 +5,8 @@ class Piece:
         self.color = color
         self.name = name
         self.notation = notation
-        self.sprite = pygame.image.load("Sprites/" + color + "_" + name + ".png")
-    def findMoves():
-        
-        return True
+        self.sprite = str("Sprites/" + color + "_" + name + ".png")
+    
 
 class King(Piece):
     
@@ -22,10 +20,6 @@ class King(Piece):
         self.moves = moves
         super().__init__(color, "king", "k")
 
-    def inCheck():
-        return False
-    def castle():
-        return True
 
 class Queen(Piece):
     
@@ -94,9 +88,3 @@ class Pawn(Piece):
             moves.append((0, 1))
         self.moves = moves
         super().__init__(color, "pawn", "p")
-
-    def enPassant():
-        return True
-    def firstMove():
-        
-        return True

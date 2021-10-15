@@ -11,6 +11,6 @@ s.send(msg)
 
 #s.send(bytes("Hello", "utf-8"))
 
-msg = s.recv(1024)#max size of message
+#msg = s.recv(1024)#max size of message
 
-print(msg.decode("utf-8"))
+#print(msg.decode("utf-8"))

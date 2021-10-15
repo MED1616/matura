@@ -18,9 +18,5 @@ while True:
     msg = pickle.loads(data)
     print(msg)
 
-    clientsocket.send(bytes("Welcome to the server!", "utf-8"))#send data to clientsocket
+    #clientsocket.send(bytes("Welcome to the server!", "utf-8"))#send data to clientsocket
     clientsocket.close()
-
-
-
-
