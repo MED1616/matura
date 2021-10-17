@@ -819,7 +819,8 @@ def main():
                                         if NotOpen:
                                             sOpponent = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                                             sOpponent.connect((opponentIP, 6006))#(IP, Port)
-                                        
+                                            NotOpen = False
+                                            
                                         msg = pickle.dumps(board)
                                         print(msg, len(msg))
                                         sOpponent.send(msg)
