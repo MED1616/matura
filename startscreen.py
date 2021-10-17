@@ -464,7 +464,7 @@ def displayIP():
     # host menu button
     w, h = 700, 100
     l, t = x/2 - w/2, (2*y)/3 - h/2
-    button = pygame.Rect(l, t, w, h)
+
     text1 = 'Host Game'  # 160, 35
     text2 = 'You dont need to enter an IP to host a Game'  # 650, 35
     textButton1 = textFont.render(text1, True, white)
@@ -477,24 +477,26 @@ def displayIP():
     surface.set_alpha(200)
 
     screen.blit(surface, (l, t))
+    return (l, t), surface.get_size()
     # give l, t, w, h to inputField
 
 
 def inputField():
-    x, y = screen.get_size()
-    textFont = pygame.font.SysFont("calibri", 35, True)
-    w, h = 500, 50
-    left = (screen.get_size()[0] - w)/2
-    top = (screen.get_size()[1] - h)/2 + 10
-    inputField = pygame.Rect(left, top, w, h)
-    clicked = True
     inputFinished = False
-    opponent_ip = '192.168.0.1'
-    dimension = 700, 100,  x/2 - w/2, (2*y)/3 - h/2
-    button = pygame.Rect(dimension[0], dimension[1],
-                         dimension[2], dimension[3])
-
     while not inputFinished:
+        x, y = screen.get_size()
+        textFont = pygame.font.SysFont("calibri", 35, True)
+        w, h = 500, 50
+        left = (screen.get_size()[0] - w)/2
+        top = (screen.get_size()[1] - h)/2 + 10
+        inputField = pygame.Rect(left, top, w, h)
+        clicked = True
+        inputFinished = False
+        opponent_ip = '192.168.0.1'
+
+        (l, t), size = displayIP()
+        button = pygame.Rect(l, t, size[0], size[1])
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
@@ -503,7 +505,6 @@ def inputField():
                 if inputField.collidepoint((x, y)):
                     clicked = True
                 elif button.collidepoint(x, y):
-                    print(11111111111111, 12432421, x, y, button)
                     hosting = True
                     return hosting
                 else:
@@ -516,6 +517,8 @@ def inputField():
                         opponent_ip = opponent_ip[:-1]
                     else:
                         opponent_ip += event.unicode
+            elif event.type == pygame.VIDEORESIZE:
+                x, y = screen.get_size()
 
         x, y = screen.get_size()
         screen.fill((0, 0, 0))
@@ -523,7 +526,7 @@ def inputField():
         image = pygame.transform.smoothscale(image, (y, y))
         screen.blit(image, ((x-y)/2, 0))
 
-        displayIP()
+        (l, t), size = displayIP()
 
         inputF = textFont.render(opponent_ip, True, color)
         if inputF.get_size()[0] + 15 > w:
@@ -683,6 +686,8 @@ def main():
             
             print(682, board, '----------------------------------------------')
             turn = playerColor
+
+
             drawBoard(board, turn)
             pygame.event.get()
             pygame.display.update()
@@ -692,6 +697,7 @@ def main():
             else:
                 drawBoard(board, turn)
             pygame.display.flip()
+
 
             if not checkForCheckmate(board, turn):
                 checkmateMessage(turn)
@@ -896,6 +902,5 @@ def main():
                 top, left, squareSize = defineSize()
                 screen.fill(color)
                 drawBoard(board, turn)
-            
 
 main()
