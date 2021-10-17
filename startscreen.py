@@ -373,10 +373,11 @@ def drawPromotion(c):
 
 
 def castleThroughCheck(board, a, b, legalMoves, turn):
+    """
     print(legalMoves)
 
     print(turn)
-    print(board[b][a])
+    print(board[b][a])"""
     if (2, 0) in legalMoves:
 
         for add in range(0, 2):
