@@ -622,8 +622,9 @@ stalemateBoard[7][7] = pieces.King("white")
 
 def main():
     global inMenu
+    NotOpen = True
     playerColor = 'both'
-    chosenVariant = 0
+    chosenVariant = 4
     top, left, squareSize = defineSize()
     turn = "white"
     chosenPiece = None
@@ -636,12 +637,14 @@ def main():
     board = newBoard()
     #board = stalemateBoard
     drawBoard(board, turn)
-    
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind((socket.gethostname(), 6006))#(IP, Port)
+    s.listen(5) #queue size
+
     while True:
+        if chosenVariant == 0 or chosenVariant == 2:
+            s.close()
         if (chosenVariant == 1 or chosenVariant == 3) and playerColor != turn and playerColor != 'both':
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.bind((socket.gethostname(), 6006))#(IP, Port)
-            s.listen(5) #queue size
             
             msg = None
             while msg == None:
@@ -812,8 +815,9 @@ def main():
 
                                     if chosenVariant == 1 or chosenVariant == 3:
                                         # send new board to opponent
-                                        sOpponent = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                                        sOpponent.connect((opponentIP, 6006))#(IP, Port)
+                                        if NotOpen:
+                                            sOpponent = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                                            sOpponent.connect((opponentIP, 6006))#(IP, Port)
                                         
                                         msg = pickle.dumps(board)
                                         print( msg, len(msg))
