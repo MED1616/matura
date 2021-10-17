@@ -648,10 +648,10 @@ def main():
             
             msg = None
             while msg == None:
-                sOpponent, address = s.accept()
+                socketOPPONENT, address = s.accept()
                 opponentIP = address[0]
                 print(f"Connection from {address} has been established")
-                data = sOpponent.recv(5096)
+                data = socketOPPONENT.recv(5096)
                 print(data, len(data))
                 msg = pickle.loads(data)
                 
@@ -816,13 +816,12 @@ def main():
 
                                     if chosenVariant == 1 or chosenVariant == 3:
                                         # send new board to opponent
-                                        
+                                        print(msg, len(msg))
                                         sOpponent = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                                         sOpponent.connect((opponentIP, 6006))#(IP, Port)
                                         
 
                                         msg = pickle.dumps(board)
-                                        print(msg, len(msg))
                                         sOpponent.send(msg)
                                         
                                         
