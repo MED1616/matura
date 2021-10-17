@@ -646,17 +646,36 @@ def main():
             s.close()
         if (chosenVariant == 1 or chosenVariant == 3) and playerColor != turn and playerColor != 'both':
             
-            msg = None
-            while msg == None:
+            full_msg = b''
+            new_msg = True
+            while len(full_msg)-8 != msglen:
                 socketOPPONENT, address = s.accept()
                 opponentIP = address[0]
                 print(f"Connection from {address} has been established")
+                """
                 data = socketOPPONENT.recv(5096)
                 print(data, len(data))
                 msg = pickle.loads(data)
-                
+                """
+                msg = socketOPPONENT.recv(16)
+                if new_msg:
+                    print("new msg len:",msg[:8])
+                    msglen = int(msg[:8])
+                    new_msg = False
 
-            board = msg
+                print(f"full message length: {msglen}")
+
+                full_msg += msg
+
+                print(len(full_msg))
+
+                
+            print("full msg recvd")
+            print(full_msg[8:])
+            print(pickle.loads(full_msg[8:]))
+            
+            board = full_msg[8:]
+
             turn = playerColor
             drawBoard(board, turn)
             if not checkForCheckmate(board, turn):
@@ -817,6 +836,7 @@ def main():
                                     if chosenVariant == 1 or chosenVariant == 3:
                                         # send new board to opponent
                                         msg = pickle.dumps(board)
+                                        msg = bytes(f"{len(msg):<{8}}", 'utf-8')+msg
                                         print(msg, len(msg))
                                         sOpponent = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                                         sOpponent.connect((opponentIP, 59822))#(IP, Port)
