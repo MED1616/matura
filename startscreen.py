@@ -1,6 +1,8 @@
 import pieces
-import sys, pygame
-import socket, pickle
+import sys
+import pygame
+import socket
+import pickle
 
 pygame.init()
 
@@ -18,12 +20,14 @@ screen.fill(color)
 brown = (153, 102, 51)
 lightBrown = (236, 217, 198)
 
+
 def defineSize():
     size = screen.get_size()
     top = size[1]/10
     left = (size[0] - (size[1] - 2*top)) / 2
     squareSize = int((size[1] - 2*top) / 8)
     return int(top), int(left), int(squareSize)
+
 
 def drawMenu():
     top, left, squareSize = defineSize()
@@ -51,13 +55,15 @@ def drawMenu():
         surface.fill(brown)
         surface.blit(texts[a], ((maxWidth-width)/2 + 20, 5))
         surface.set_alpha(200)
-        screen.blit(surface, (x/2-maxWidth/2 - 20,(top + squareSize + 2*a*squareSize - heightLetters/2 - 5)))
-        
+        screen.blit(surface, (x/2-maxWidth/2 - 20,
+                    (top + squareSize + 2*a*squareSize - heightLetters/2 - 5)))
+
+
 def chooseVariant(x, y):
     top, left, squareSize = defineSize()
     xVal, yVal = screen.get_size()
     if x > xVal/2 - 239 and x < xVal/2 + 239:
-        if y > top + squareSize - 35/2 - 5 and y < top + squareSize - 35/2 - 5 + 45:  
+        if y > top + squareSize - 35/2 - 5 and y < top + squareSize - 35/2 - 5 + 45:
             return 0
         elif y > top + squareSize + 2*squareSize - 35/2 - 5 and y < top + squareSize + 2*squareSize - 35/2 - 5 + 45:
             return 1
@@ -66,26 +72,28 @@ def chooseVariant(x, y):
         elif y > top + squareSize + 6*squareSize - 35/2 - 5 and y < top + squareSize + 6*squareSize - 35/2 - 5 + 45:
             return 3
 
+
 def drawBoard(board, turn):
     if inMenu:
         drawMenu()
     else:
         top, left, squareSize = defineSize()
-        
+
         screen.fill(color)
 
         for a in range(8):
             for b in range(8):
-                
+
                 if (a + b) % 2 == 1:
-                    square = ((left + a * squareSize), (top + b * squareSize), squareSize, squareSize)
+                    square = ((left + a * squareSize), (top + b *
+                              squareSize), squareSize, squareSize)
                     pygame.draw.rect(screen, brown, square)
-                    
-                    
+
                 else:
-                    square = ((left + a * squareSize), (top + b * squareSize), squareSize, squareSize)
+                    square = ((left + a * squareSize), (top + b *
+                              squareSize), squareSize, squareSize)
                     pygame.draw.rect(screen, lightBrown, square)
-                    
+
         if inCheck(board, turn):
             drawCheck(board, turn)
         else:
@@ -98,6 +106,7 @@ def newBoard():
     def placePieces(color):
         return [pieces.Rook(color), pieces.Knight(color), pieces.Bishop(color), pieces.Queen(color),
                 pieces.King(color), pieces.Bishop(color), pieces.Knight(color), pieces.Rook(color)]
+
     def placePawns(color):
         return [pieces.Pawn(color) for i in range(8)]
 
@@ -107,9 +116,10 @@ def newBoard():
     board[7] = placePieces("white")
     board[1] = placePawns("black")
     board[6] = placePawns("white")
-    
+
     return board
-    
+
+
 def findClickedSquare(pos):
     top, left, squareSize = defineSize()
     x, y = pos
@@ -118,28 +128,33 @@ def findClickedSquare(pos):
     y = int((y-top)/squareSize)
     return x, y
 
+
 def drawPieces(board):
     top, left, squareSize = defineSize()
-    
+
     for a in range(8):
         for b in range(8):
-            
+
             if board[b][a] != None:
                 coord = ((left + squareSize * a), (top + squareSize * b))
                 spriteOfPiece = pygame.image.load(board[b][a].sprite)
-                image = pygame.transform.smoothscale(spriteOfPiece, (squareSize, squareSize))
+                image = pygame.transform.smoothscale(
+                    spriteOfPiece, (squareSize, squareSize))
                 screen.blit(image, coord)
     pygame.display.update()
+
 
 def drawChosenPiece(board, x, y):
     top, left, squareSize = defineSize()
 
-    square = ((left + x * squareSize), (top + y * squareSize), squareSize, squareSize)
-    pygame.draw.rect(screen, (0, 200, 0 ), square)
+    square = ((left + x * squareSize), (top + y *
+              squareSize), squareSize, squareSize)
+    pygame.draw.rect(screen, (0, 200, 0), square)
 
     coord = ((left + squareSize * x), (top + squareSize * y))
     spriteOfPiece = pygame.image.load(board[y][x].sprite)
-    image = pygame.transform.smoothscale(spriteOfPiece, (squareSize, squareSize))
+    image = pygame.transform.smoothscale(
+        spriteOfPiece, (squareSize, squareSize))
     screen.blit(image, coord)
     pygame.display.update()
 
@@ -151,7 +166,7 @@ def findLegalMoves(board, chosenPiece, turn):
     mov = list(board[y][x].moves)
 
     legalMoves = []
-    
+
     ########################
     if board[y][x].name == "pawn":
         if board[y][x].color == "white" and y == 6:
@@ -159,22 +174,22 @@ def findLegalMoves(board, chosenPiece, turn):
         elif board[y][x].color == "black" and y == 1:
             b = 2
         else:
-            b = 1 
+            b = 1
 
         for m in mov:
             for a in range(1, b + 1):
                 if 8 > x + m[0] * a > -1 and 8 > y + m[1] * a > -1 and board[y + m[1] * a][x + m[0] * a] == None:
                     moveset.append((m[0] * a, m[1] * a))
-                    
+
                 elif 8 > x + m[0] * a > -1 and 8 > y + m[1] * a > -1 and board[y + m[1] * a][x + m[0] * a].color != turn:
                     if (m[0] * a, m[1] * a) in moveset:
                         moveset.remove((m[0] * a, m[1] * a))
                     break
-                    
+
                 else:
                     break
-        
-        #capture sideways
+
+        # capture sideways
         if board[y][x].color == "black":
             yDir = -1
         else:
@@ -182,16 +197,16 @@ def findLegalMoves(board, chosenPiece, turn):
 
         if 8 > x + 1 > -1 and 8 > y - 1 * yDir > -1 and board[y - 1 * yDir][x + 1] != None and board[y - 1 * yDir][x + 1].color != turn:
             legalMoves.append((1, - yDir))
-                        
+
         if 8 > x - 1 > -1 and 8 > y - 1 * yDir > -1 and board[y - 1 * yDir][x - 1] != None and board[y - 1 * yDir][x - 1].color != turn:
-            legalMoves.append((-1, -yDir)) 
+            legalMoves.append((-1, -yDir))
 
     ###############################################
 
     if board[y][x].name == "queen" or board[y][x].name == "rook" or board[y][x].name == "bishop":
         for m in mov:
             for a in range(1, 8):
-                
+
                 if 8 > x + m[0] * a > -1 and 8 > y + m[1] * a > -1 and board[y + m[1] * a][x + m[0] * a] == None:
                     moveset.append((m[0] * a, m[1] * a))
                 elif 8 > x + m[0] * a > -1 and 8 > y + m[1] * a > -1 and board[y + m[1] * a][x + m[0] * a].color != turn:
@@ -205,13 +220,13 @@ def findLegalMoves(board, chosenPiece, turn):
             if 8 > x + m[0] > -1 and 8 > y + m[1] > -1 and board[y + m[1]][x + m[0]] == None:
                 moveset.append((m[0], m[1]))
             elif 8 > x + m[0] > -1 and 8 > y + m[1] > -1 and board[y + m[1]][x + m[0]].color != turn:
-                moveset.append((m[0], m[1])) 
+                moveset.append((m[0], m[1]))
 
             ######################################
         if board[y][x].castlingAllowed == True:
-            #check short castle
+            # check short castle
             shortCastle = (False, False)
-            
+
             if x + 2 < 8 and board[y][x + 1] == None and board[y][x + 2] == None:
                 shortCastle = (True, shortCastle[1])
             if x + 3 < 8 and board[y][x + 3] != None:
@@ -222,7 +237,7 @@ def findLegalMoves(board, chosenPiece, turn):
                 moveset.append((2, 0))
 
             ############################################
-            #check long castle
+            # check long castle
             longCastle = (False, False)
             if x - 3 > -1 and board[y][x - 1] == None and board[y][x - 2] == None and board[y][x - 3] == None:
                 longCastle = (True, longCastle[1])
@@ -237,26 +252,27 @@ def findLegalMoves(board, chosenPiece, turn):
             if 8 > x + m[0] > -1 and 8 > y + m[1] > -1 and board[y + m[1]][x + m[0]] == None:
                 moveset.append((m[0], m[1]))
             elif 8 > x + m[0] > -1 and 8 > y + m[1] > -1 and board[y + m[1]][x + m[0]].color != turn:
-                moveset.append((m[0], m[1])) 
+                moveset.append((m[0], m[1]))
 
     for m in moveset:
         if 8 > x + m[0] > -1 and 8 > y + m[1] > -1 and (board[y + m[1]][x + m[0]] == None or board[y + m[1]][x + m[0]].color != turn):
             legalMoves.append((m[0], m[1]))
-    
-    
+
     return legalMoves
+
 
 def drawLegalMoves(board, chosenPiece, turn):
     top, left, squareSize = defineSize()
-    ######################## findLegalMoves -> findAllLegalMoves
+    # findLegalMoves -> findAllLegalMoves
     legalMoves = findAllLegalMoves(board, chosenPiece, turn)
     x, y = chosenPiece
-   
+
     for l in legalMoves:
         l = (l[0] + x, l[1] + y)
-        center = ((l[0]*squareSize + left + squareSize/2), (l[1]*squareSize + top + squareSize/2))
+        center = ((l[0]*squareSize + left + squareSize/2),
+                  (l[1]*squareSize + top + squareSize/2))
         pygame.draw.circle(screen, (10, 10, 10), center, squareSize/3)
-    
+
 
 def moveToNotation(moveHistory, notationHistory):
     length = len(moveHistory)
@@ -264,7 +280,8 @@ def moveToNotation(moveHistory, notationHistory):
     notation = lastMove[0] + chr(int(lastMove[1]) + 65) + lastMove[2]
     notationHistory.append(notation)
     return notationHistory
-    
+
+
 def getPawnPromotion(x, y):
     top, left, squareSize = defineSize()
     width, heigth = screen.get_size()
@@ -281,10 +298,11 @@ def getPawnPromotion(x, y):
             return "bishop"
         elif x == 3:
             return "knight"
-        else: 
+        else:
             return 0
     else:
         return 0
+
 
 def findKing(board, turn):
     for y in range(8):
@@ -292,11 +310,12 @@ def findKing(board, turn):
             if board[y][x] != None and board[y][x].name == "king" and board[y][x].color == turn:
                 return x, y
 
+
 def inCheck(board, turn):
     a, b = findKing(board, turn)
 
-    #we want to know whether the black king is in check after white moved, therefore we need to find the legal moves of white(def findLegalMove). 
-    #But turn would be black because white just moved, so we switch turn.
+    # we want to know whether the black king is in check after white moved, therefore we need to find the legal moves of white(def findLegalMove).
+    # But turn would be black because white just moved, so we switch turn.
     if turn == "white":
         turn = "black"
     else:
@@ -304,19 +323,23 @@ def inCheck(board, turn):
 
     for y in range(8):
         for x in range(8):
-            if board[y][x] != None and board[y][x].color == turn: #this turn and the turn in the next line need to be the same
+            # this turn and the turn in the next line need to be the same
+            if board[y][x] != None and board[y][x].color == turn:
                 lMoves = findLegalMoves(board, (x, y), turn)
                 for m in lMoves:
                     if m[0] + x == a and m[1] + y == b:
                         return True
     return False
 
+
 def drawCheck(board, turn):
     top, left, squareSize = defineSize()
     x, y = findKing(board, turn)
-    square = (left + x * squareSize, top + y * squareSize, squareSize, squareSize)
+    square = (left + x * squareSize, top + y *
+              squareSize, squareSize, squareSize)
     pygame.draw.rect(screen, (255, 0, 0), square)
     drawPieces(board)
+
 
 def drawPromotion(c):
     screen.fill(color)
@@ -324,7 +347,7 @@ def drawPromotion(c):
     lightBrown = (236, 217, 198)
     top, left, squareSize = defineSize()
     width, height = screen.get_size()
-    
+
     promotionPieces = ["queen", "rook", "bishop", "knight"]
 
     for a in range(4):
@@ -335,7 +358,7 @@ def drawPromotion(c):
             sColor = lightBrown
         else:
             sColor = brown
-                                    
+
         pygame.draw.rect(screen, sColor, square)
 
         name = promotionPieces[a]
@@ -348,13 +371,14 @@ def drawPromotion(c):
 
 ###############################################
 
+
 def castleThroughCheck(board, a, b, legalMoves, turn):
     print(legalMoves)
-    
+
     print(turn)
     print(board[b][a])
     if (2, 0) in legalMoves:
-        
+
         for add in range(0, 2):
             virtualBoard = []
             for q in range(8):
@@ -366,7 +390,7 @@ def castleThroughCheck(board, a, b, legalMoves, turn):
                 break
 
     if (-2, 0) in legalMoves:
-        print (legalMoves)
+        print(legalMoves)
         for add in range(0, -2, -1):
             virtualBoard = []
             for q in range(8):
@@ -378,6 +402,7 @@ def castleThroughCheck(board, a, b, legalMoves, turn):
                 break
 
     return legalMoves
+
 
 def removeMovesDueToCheck(board, a, b, turn, legalMoves):
     if board[b][a] != None and board[b][a].color == turn:
@@ -395,22 +420,25 @@ def removeMovesDueToCheck(board, a, b, turn, legalMoves):
                 legalMoves.remove(m)
     return legalMoves
 
+
 def findAllLegalMoves(board, chosenPiece, turn):
     a, b = chosenPiece
     legalMoves = findLegalMoves(board, chosenPiece, turn)
     return removeMovesDueToCheck(board, a, b, turn, legalMoves)
 
+
 def variant(board, target, turn):
     x, y = target
-    
-    if board[y][x].name == "queen": 
+
+    if board[y][x].name == "queen":
         board[y][x] = pieces.Queen(turn)
-    elif board[y][x].name == "rook": 
+    elif board[y][x].name == "rook":
         board[y][x] = pieces.Rook(turn)
-    elif board[y][x].name == "bishop": 
+    elif board[y][x].name == "bishop":
         board[y][x] = pieces.Bishop(turn)
-    elif board[y][x].name == "knight": 
+    elif board[y][x].name == "knight":
         board[y][x] = pieces.Knight(turn)
+
 
 def displayIP():
     heightLetters = 35
@@ -428,26 +456,27 @@ def displayIP():
     surface.blit(text_ip, (20, 5))
     surface.set_alpha(200)
 
-    screen.blit(surface, (x/2-w/2-20, y/3- h/2 - 5))
+    screen.blit(surface, (x/2-w/2-20, y/3 - h/2 - 5))
 
-    #host menu button
+    # host menu button
     w, h = 700, 100
     l, t = x/2 - w/2, (2*y)/3 - h/2
-    
+
     button = pygame.Rect(l, t, w, h)
-    text1 = 'Host Game'  #160, 35
-    text2 = 'You dont need to enter an IP to host a Game' #650, 35
+    text1 = 'Host Game'  # 160, 35
+    text2 = 'You dont need to enter an IP to host a Game'  # 650, 35
     textButton1 = textFont.render(text1, True, white)
     textButton2 = textFont.render(text2, True, white)
 
     surface = pygame.Surface((w, h))
     surface.fill(color)
-    surface.blit(textButton1, (700/2 - 160/2 ,10))
-    surface.blit(textButton2, (700/2 - 650/2 ,10 + 35 + 10))
+    surface.blit(textButton1, (700/2 - 160/2, 10))
+    surface.blit(textButton2, (700/2 - 650/2, 10 + 35 + 10))
     surface.set_alpha(200)
 
     screen.blit(surface, (l, t))
-    #give l, t, w, h to inputField
+    # give l, t, w, h to inputField
+
 
 def inputField():
     x, y = screen.get_size()
@@ -460,7 +489,8 @@ def inputField():
     inputFinished = False
     opponent_ip = ''
     dimension = 700, 100,  x/2 - w/2, (2*y)/3 - h/2
-    button = pygame.Rect(dimension[0], dimension[1], dimension[2], dimension[3])
+    button = pygame.Rect(dimension[0], dimension[1],
+                         dimension[2], dimension[3])
 
     while not inputFinished:
         for event in pygame.event.get():
@@ -485,11 +515,11 @@ def inputField():
                         opponent_ip += event.unicode
 
         x, y = screen.get_size()
-        screen.fill((0,0,0))
+        screen.fill((0, 0, 0))
         image = pygame.image.load("Sprites/chess_position.png")
         image = pygame.transform.smoothscale(image, (y, y))
         screen.blit(image, ((x-y)/2, 0))
-        
+
         displayIP()
 
         inputF = textFont.render(opponent_ip, True, color)
@@ -500,8 +530,87 @@ def inputField():
         pygame.draw.rect(screen, color, inputField, 5)
         pygame.display.update()
 
-def hostGame():
+def checkStalemate(board, turn):
+    isStalemate = True
+    for a in range(8):
+        for b in range(8):
+            if board[b][a] != None and board[b][a].color == turn:
+                if findAllLegalMoves(board, (a, b), turn) != []:
+                    isStalemate = False
+                    break
+    if inCheck(board, turn):
+        isStalemate = False
+    return isStalemate
+
+def stalemate():
+    msg = f'Stalemate, press enter'
+    textFont = pygame.font.SysFont("calibri", 50, True)
+    winMsg = textFont.render(msg, True, white)
+
+    wid = winMsg.get_size()[0]
+
+    surf = pygame.Surface((wid + 20, 70))
+    surf.fill(brown)
+    surf.set_alpha(200)
+    size = screen.get_size()
+    surf.blit(winMsg, (10, 10))
+    screen.blit(surf, (size[0]/2 - wid/2 - 10, size[1]/2 - 35))
+    pygame.display.update()
+    pressedEscape = False
+    while pressedEscape == False:
+        for event2 in pygame.event.get():
+            if event2.type == pygame.KEYDOWN and event2.key == pygame.K_RETURN:
+                pressedEscape = True
+    
+def checkForCheckmate(board, turn):
+    if inCheck(board, turn):
+        saved = False
+        for b in range(8):
+            for a in range(8):
+                if board[b][a] != None and board[b][a].color == turn:
+                    lMoves = findLegalMoves(board, (a, b), turn)
+                    virtualBoard = []
+                    lMovesCopy = list(lMoves)
+                    for m in lMovesCopy:
+                        virtualBoard = []
+                        for q in range(8):
+                            virtualBoard.append(list(board[q]))
+                        virtualBoard[b + m[1]][a + m[0]] = virtualBoard[b][a]
+                        virtualBoard[b][a] = None
+                        if not inCheck(virtualBoard, turn):
+                            saved = True
+                        else:
+                            lMoves.remove(m)
+                    #print(lMoves, board[b][a].name, (a, b))
+        return saved
     return True
+
+def checkmateMessage(turn):
+    if turn == 'white':
+
+        winner = 'black'
+    else:
+        winner = 'white'
+
+    msg = f'Checkmate, {winner} won. press enter'
+    textFont = pygame.font.SysFont("calibri", 50, True)
+    winMsg = textFont.render(msg, True, white)
+
+    wid = winMsg.get_size()[0]
+
+    surf = pygame.Surface((wid + 20, 70))
+    surf.fill(brown)
+    surf.set_alpha(200)
+    size = screen.get_size()
+    surf.blit(winMsg, (10, 10))
+    screen.blit(surf, (size[0]/2 - wid/2 - 10, size[1]/2 - 35))
+    pygame.display.update()
+    pressedEscape = False
+    while pressedEscape == False:
+        for event2 in pygame.event.get():
+            if event2.type == pygame.KEYDOWN and event2.key == pygame.K_RETURN:
+                pressedEscape = True
+        
     
 def main():
     global inMenu
@@ -530,18 +639,35 @@ def main():
                 clientsocket, address = s.accept()
                 opponentIP = address[0]
                 print(f"Connection from {address} has been established")
-
                 data = clientsocket.recv(5096)
-                
                 msg = pickle.loads(data)
-                
-                board = msg
-
                 clientsocket.close()
-                #board = msg
-                turn = playerColor
+
+            board = msg
+            turn = playerColor
+            drawBoard(board, turn)
+            if not checkForCheckmate(board, turn):
+                checkmateMessage(turn)
+                inMenu = True
+                turn = "white"
+                board = newBoard()
+                moveHistory = []
+                notationHistory = []
                 drawBoard(board, turn)
-                
+
+                print("Checkmate, ", turn, " loses")
+            if checkStalemate(board, turn):
+                drawBoard(board, turn)
+
+                stalemate()
+
+                inMenu = True
+                board = newBoard()
+                moveHistory = []
+                notationHistory = []
+                turn = "white"
+            pygame.display.update()
+            
         for event in pygame.event.get():
             if event.type == pygame.QUIT: 
                 sys.exit()
@@ -568,25 +694,7 @@ def main():
                         print(opponentIP)
                         inMenu = False
                         drawBoard(board, turn)
-                    """
-                elif (chosenVariant == 1 or chosenVariant == 3) and playerColor != turn and playerColor != 'both':
-                    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    s.bind((socket.gethostname(), 4949))#(IP, Port)
-                    s.listen(5) #queue size
-                    print(socket.gethostname())
-                    print(socket.gethostbyname(socket.gethostname()))
-                    msg = None
-                    while msg == None:
-                        clientsocket, address = s.accept()
-                        print(f"Connection from {address} has been established")
-
-                        data = clientsocket.recv(1024)
-                        msg = pickle.loads(data)
-                        print(msg)
-                        clientsocket.close()
-                    board = msg
-                    turn = playerColor
-                    """
+                    
                 else:
                     top, left, squareSize = defineSize()
                     pos = pygame.mouse.get_pos()
@@ -625,30 +733,30 @@ def main():
                                 moveHistory.append(board[oldY][oldX].notation + str(x) + str(8 - y))
                                 notationHistory = moveToNotation(moveHistory, notationHistory)
                                 print(notationHistory)
-                                #TODO: add Checks, castling, captures and promotion to notation
+                                # TODO: add Checks, castling, captures and promotion to notation
                                 
                                 if board[oldY][oldX].name == "king" or board[oldY][oldX].name == "rook":
                                     board[oldY][oldX].castlingAllowed = False
                                 
                                 if board[oldY][oldX].name == "king" and diff == (2, 0):
-                                    #move rook for short castling
+                                    # move rook for short castling
                                     board[oldY][oldX + 1] = board[oldY][oldX + 3]
                                     board[oldY][oldX + 3] = None
                                 elif board[oldY][oldX].name == "king" and diff == (-2, 0):
-                                    #move rook for long castling
+                                    # move rook for long castling
                                     board[oldY][oldX - 1] = board[oldY][oldX - 4]
                                     board[oldY][oldX - 4] = None
 
                                 #########################################
-                                #promotion
+                                # promotion
                                 undidMove = False #for control later on
                                 if board[oldY][oldX].name == "pawn" and (y == 7 or y == 0):
-                                    #promotion
+                                    # promotion
                                     drawPromotion(board[oldY][oldX].color)
 
                                     if inCheck(board, turn):
                                         drawCheck(board, turn)
-                                    #pygame.display.update()
+                                    # pygame.display.update()
 
                                     promoteTo = None
                                     
@@ -678,7 +786,7 @@ def main():
                                 #######################################################
                                 
                                 if undidMove == False: #if not promoted
-                                    #variant
+                                    # variant
                                     if board[oldY][oldX].name == "pawn" and board[target[1]][target[0]] != None and board[target[1]][target[0]].name != "pawn" and (chosenVariant == 2 or chosenVariant == 3):
                                         variant(board, target, turn)
                                     else:
@@ -694,53 +802,26 @@ def main():
                                         turn = "white"
 
                                     if chosenVariant == 1 or chosenVariant == 3:
-                                        #send new board to opponent
+                                        # send new board to opponent
                                         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                                         s.connect((opponentIP, 4949))#(IP, Port)
                                         
                                         msg = pickle.dumps(board)
-                                        print(len(msg))
+                                        print(len(msg), sys.getsizeof(msg))
                                         s.send(msg)
 
-                                    #check for stalemate
-                                    isStalemate = True
-                                    for a in range(8):
-                                        for b in range(8):
-                                            if board[b][a] != None and board[b][a].color == turn:
-                                                if findAllLegalMoves(board, (a, b), turn) != []:
-                                                    isStalemate = False
-                                                    break
-                                    if inCheck(board, turn):
-                                        isStalemate = False
-                                    
-
-                                    if isStalemate:
+                                    # check for stalemate
+                                    if checkStalemate(board, turn):
                                         drawBoard(board, turn)
-                                        msg = f'Stalemate'
-                                        textFont = pygame.font.SysFont("calibri", 50, True)
-                                        winMsg = textFont.render(msg, True, white)
 
-                                        wid = winMsg.get_size()[0]
+                                        stalemate()
 
-                                        surf = pygame.Surface((wid + 20, 70))
-                                        surf.fill(brown)
-                                        surf.set_alpha(200)
-                                        size = screen.get_size()
-                                        surf.blit(winMsg, (10, 10))
-                                        screen.blit(surf, (size[0]/2 - wid/2 - 10, size[1]/2 - 35))
-                                        pygame.display.update()
-                                        pressedEscape = False
-                                        while pressedEscape == False:
-                                            for event2 in pygame.event.get():
-                                                if event2.type == pygame.KEYDOWN and event2.key == pygame.K_RETURN:
-                                                    pressedEscape = True
                                         inMenu = True
                                         board = newBoard()
                                         moveHistory = []
                                         notationHistory = []
                                         turn = "white"
 
-                                        print("isStalemate: ", isStalemate)
                                     drawBoard(board, turn)
                                 else:
                                     target = None
@@ -751,57 +832,16 @@ def main():
                                 target = None
                                 drawBoard(board, turn)
 
-                            if inCheck(board, turn):
-                                saved = False
-                                for b in range(8):
-                                    for a in range(8):
-                                        if board[b][a] != None and board[b][a].color == turn:
-                                            lMoves = findLegalMoves(board, (a, b), turn)
-                                            virtualBoard = []
-                                            lMovesCopy = list(lMoves)
-                                            for m in lMovesCopy:
-                                                virtualBoard = []
-                                                for q in range(8):
-                                                    virtualBoard.append(list(board[q]))
-                                                virtualBoard[b + m[1]][a + m[0]] = virtualBoard[b][a]
-                                                virtualBoard[b][a] = None
-                                                if not inCheck(virtualBoard, turn):
-                                                    saved = True
-                                                else:
-                                                    lMoves.remove(m)
-                                            print(lMoves, board[b][a].name, (a, b))
-                                            
-                                if not saved:
-                                    if turn == 'white':
-                                        winner = 'black'
-                                    else:
-                                        winner = 'white'
+                            if not checkForCheckmate(board, turn):
+                                checkmateMessage(turn)
+                                inMenu = True
+                                turn = "white"
+                                board = newBoard()
+                                moveHistory = []
+                                notationHistory = []
+                                drawBoard(board, turn)
 
-                                    msg = f'Checkmate, {winner} won'
-                                    textFont = pygame.font.SysFont("calibri", 50, True)
-                                    winMsg = textFont.render(msg, True, white)
-
-                                    wid = winMsg.get_size()[0]
-
-                                    surf = pygame.Surface((wid + 20, 70))
-                                    surf.fill(brown)
-                                    surf.set_alpha(200)
-                                    size = screen.get_size()
-                                    surf.blit(winMsg, (10, 10))
-                                    screen.blit(surf, (size[0]/2 - wid/2 - 10, size[1]/2 - 35))
-                                    pygame.display.update()
-                                    pressedEscape = False
-                                    while pressedEscape == False:
-                                        for event2 in pygame.event.get():
-                                            if event2.type == pygame.KEYDOWN and event2.key == pygame.K_RETURN:
-                                                pressedEscape = True
-                                        
-                                    inMenu = True
-                                    board = newBoard()
-                                    moveHistory = []
-                                    notationHistory = []
-                                    drawBoard(board, turn)
-                                    print("Checkmate, ", turn, " loses")
+                                print("Checkmate, ", turn, " loses")
                         
                         
                 
