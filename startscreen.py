@@ -638,7 +638,7 @@ def main():
     #board = stalemateBoard
     drawBoard(board, turn)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind((socket.gethostname(), 6006))#(IP, Port)
+    s.bind((socket.gethostname(), 59822))#(IP, Port)
     s.listen(5) #queue size
 
     while True:
@@ -819,7 +819,7 @@ def main():
                                         msg = pickle.dumps(board)
                                         print(msg, len(msg))
                                         sOpponent = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                                        sOpponent.connect((opponentIP, 6006))#(IP, Port)
+                                        sOpponent.connect((opponentIP, 59822))#(IP, Port)
                                         sOpponent.send(msg)
                                         
                                         
