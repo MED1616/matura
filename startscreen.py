@@ -486,7 +486,7 @@ def inputField():
     inputField = pygame.Rect(left, top, w, h)
     clicked = True
     inputFinished = False
-    opponent_ip = ''
+    opponent_ip = '192.168.0.1'
     dimension = 700, 100,  x/2 - w/2, (2*y)/3 - h/2
     button = pygame.Rect(dimension[0], dimension[1],
                          dimension[2], dimension[3])
@@ -681,10 +681,12 @@ def main():
             board = pickle.loads(full_msg[8:])
             
             turn = playerColor
+            print(12222222222222222222222222)
             drawBoard(board, turn)
+            pygame.display.update()
+            print(23459634567)
 
             if not checkForCheckmate(board, turn):
-                print(1111111111)
                 checkmateMessage(turn)
                 inMenu = True
                 turn = "white"
