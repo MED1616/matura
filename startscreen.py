@@ -819,7 +819,8 @@ def main():
                                         msg = pickle.dumps(board)
                                         print(len(msg), sys.getsizeof(msg))
                                         s.send(msg)
-
+                                        s.close()
+                                        
                                     # check for stalemate
                                     if checkStalemate(board, turn):
                                         drawBoard(board, turn)
