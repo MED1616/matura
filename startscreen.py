@@ -816,12 +816,10 @@ def main():
 
                                     if chosenVariant == 1 or chosenVariant == 3:
                                         # send new board to opponent
+                                        msg = pickle.dumps(board)
                                         print(msg, len(msg))
                                         sOpponent = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                                         sOpponent.connect((opponentIP, 6006))#(IP, Port)
-                                        
-
-                                        msg = pickle.dumps(board)
                                         sOpponent.send(msg)
                                         
                                         
