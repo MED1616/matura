@@ -650,6 +650,7 @@ def main():
             new_msg = True
             msglen = 3000
             while len(full_msg)-8 != msglen:
+                print(len(full_msg)-8, msglen)
                 socketOPPONENT, address = s.accept()
                 opponentIP = address[0]
                 print(f"Connection from {address} has been established")
