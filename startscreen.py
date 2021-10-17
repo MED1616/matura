@@ -461,7 +461,6 @@ def displayIP():
     # host menu button
     w, h = 700, 100
     l, t = x/2 - w/2, (2*y)/3 - h/2
-
     button = pygame.Rect(l, t, w, h)
     text1 = 'Host Game'  # 160, 35
     text2 = 'You dont need to enter an IP to host a Game'  # 650, 35
@@ -501,6 +500,7 @@ def inputField():
                 if inputField.collidepoint((x, y)):
                     clicked = True
                 elif button.collidepoint(x, y):
+                    print(11111111111111, 12432421, x, y, button)
                     hosting = True
                     return hosting
                 else:
@@ -651,7 +651,7 @@ def main():
                 data = clientsocket.recv(5096)
                 msg = pickle.loads(data)
                 clientsocket.close()
-                
+            s.close()
 
             board = msg
             turn = playerColor

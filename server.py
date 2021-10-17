@@ -1,22 +1,21 @@
 import socket
+import time
 import pickle
 
 
-# IP Laptop: '192.168.0.108'
-# IP PC: '192.168.0.110'
+HEADERSIZE = 10
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((socket.gethostname(), 4444))#(IP, Port)
-s.listen(5) #queue size
-print(socket.gethostname())
-print(socket.gethostbyname(socket.gethostname()))
+s.bind((socket.gethostname(), 1243))
+s.listen(5)
+print(111111111)
 while True:
+    # now our endpoint knows about the OTHER endpoint.
     clientsocket, address = s.accept()
-    print(f"Connection from {address} has been established")
+    print(f"Connection from {address} has been established.")
 
-    data = clientsocket.recv(1024)
-    msg = pickle.loads(data)
+    d = {1:"hi", 2: "there"}
+    msg = pickle.dumps(d)
+    msg = bytes(f"{len(msg):<{HEADERSIZE}}", 'utf-8')+msg
     print(msg)
-
-    #clientsocket.send(bytes("Welcome to the server!", "utf-8"))#send data to clientsocket
-    clientsocket.close()
+    clientsocket.send(msg)
