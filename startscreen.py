@@ -640,18 +640,17 @@ def main():
     while True:
         if (chosenVariant == 1 or chosenVariant == 3) and playerColor != turn and playerColor != 'both':
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.bind((socket.gethostname(), 4949))#(IP, Port)
+            s.bind((socket.gethostname(), 6006))#(IP, Port)
             s.listen(5) #queue size
             
             msg = None
             while msg == None:
-                clientsocket, address = s.accept()
+                sOpponent, address = s.accept()
                 opponentIP = address[0]
                 print(f"Connection from {address} has been established")
-                data = clientsocket.recv(5096)
+                data = sOpponent.recv(5096)
                 msg = pickle.loads(data)
-                clientsocket.close()
-            s.close()
+                
 
             board = msg
             turn = playerColor
@@ -813,13 +812,13 @@ def main():
 
                                     if chosenVariant == 1 or chosenVariant == 3:
                                         # send new board to opponent
-                                        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                                        s.connect((opponentIP, 4949))#(IP, Port)
+                                        sOpponent = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                                        sOpponent.connect((opponentIP, 6006))#(IP, Port)
                                         
                                         msg = pickle.dumps(board)
-                                        print(len(msg), sys.getsizeof(msg))
-                                        s.send(msg)
-                                        s.close()
+                                        print( msg, len(msg))
+                                        sOpponent.send(msg)
+                                        
                                         
                                     # check for stalemate
                                     if checkStalemate(board, turn):
