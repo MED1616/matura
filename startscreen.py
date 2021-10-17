@@ -681,7 +681,7 @@ def main():
             print(full_msg[8:])
             print(pickle.loads(full_msg[8:]))
             
-            board = full_msg[8:]
+            board = pickle.loads(full_msg[8:])
 
             drawBoard(board, turn)
             
