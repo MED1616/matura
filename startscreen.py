@@ -679,10 +679,13 @@ def main():
             print(pickle.loads(full_msg[8:]))
             
             board = pickle.loads(full_msg[8:])
-            
+            print(board)
             turn = playerColor
             print(12222222222222222222222222)
-            drawBoard(board, turn)
+            if inCheck(board, turn):
+                drawCheck(board, turn)
+            else:
+                drawBoard(board, turn)
             pygame.display.update()
             print(23459634567)
 
@@ -693,12 +696,11 @@ def main():
                 board = newBoard()
                 moveHistory = []
                 notationHistory = []
-                drawBoard(board, turn)
+                
 
                 print("Checkmate, ", turn, " loses")
 
             if checkStalemate(board, turn):
-                drawBoard(board, turn)
 
                 stalemate()
 
