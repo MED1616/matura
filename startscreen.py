@@ -648,6 +648,7 @@ def main():
             
             full_msg = b''
             new_msg = True
+            msglen = 0
             while len(full_msg)-8 != msglen:
                 socketOPPONENT, address = s.accept()
                 opponentIP = address[0]
