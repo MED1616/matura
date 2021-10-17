@@ -640,7 +640,7 @@ def main():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((socket.gethostname(), 59822))#(IP, Port)
     s.listen(5) #queue size
-
+    f = True 
     while True:
         if chosenVariant == 0 or chosenVariant == 2:
             s.close()
@@ -651,7 +651,8 @@ def main():
             new_msg = True
             msglen = 3000
 
-            while socketOPPONENT.fileno() == -1:
+            while f == True or socketOPPONENT.fileno() == -1:
+                f = False
                 socketOPPONENT, address = s.accept()
                 opponentIP = address[0]
                 print(f"Connection from {address} has been established")
