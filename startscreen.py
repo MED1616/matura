@@ -646,30 +646,34 @@ def main():
             s.close()
         if (chosenVariant == 1 or chosenVariant == 3) and playerColor != turn and playerColor != 'both':
             
+             
             full_msg = b''
             new_msg = True
             msglen = 3000
-            while len(full_msg)-8 != msglen:
-                print(len(full_msg)-8, msglen)
+
+            while True:
                 socketOPPONENT, address = s.accept()
                 opponentIP = address[0]
                 print(f"Connection from {address} has been established")
-                """
-                data = socketOPPONENT.recv(5096)
-                print(data, len(data))
-                msg = pickle.loads(data)
-                """
-                msg = socketOPPONENT.recv(16)
-                if new_msg:
-                    print("new msg len:",msg[:8])
-                    msglen = int(msg[:8])
-                    new_msg = False
 
-                print(f"full message length: {msglen}")
+                while len(full_msg)-8 != msglen:
+                    print(len(full_msg)-8, msglen)
+                    """
+                    data = socketOPPONENT.recv(5096)
+                    print(data, len(data))
+                    msg = pickle.loads(data)
+                    """
+                    msg = socketOPPONENT.recv(16)
+                    if new_msg:
+                        print("new msg len:",msg[:8])
+                        msglen = int(msg[:8])
+                        new_msg = False
 
-                full_msg += msg
+                    print(f"full message length: {msglen}")
 
-                print(len(full_msg))
+                    full_msg += msg
+
+                    print(len(full_msg))
 
                 
             print("full msg recvd")
