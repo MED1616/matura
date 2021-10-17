@@ -679,16 +679,9 @@ def main():
             print(pickle.loads(full_msg[8:]))
             
             board = pickle.loads(full_msg[8:])
-            print(board)
+            print(682, board, '----------------------------------------------')
             turn = playerColor
-            print(12222222222222222222222222)
-            if inCheck(board, turn):
-                drawCheck(board, turn)
-            else:
-                drawBoard(board, turn)
-            pygame.display.update()
-            print(23459634567)
-
+            print(684, not checkForCheckmate(board, turn), checkStalemate(board, turn))
             if not checkForCheckmate(board, turn):
                 checkmateMessage(turn)
                 inMenu = True
@@ -696,21 +689,25 @@ def main():
                 board = newBoard()
                 moveHistory = []
                 notationHistory = []
-                
-
                 print("Checkmate, ", turn, " loses")
 
             if checkStalemate(board, turn):
 
                 stalemate()
-
                 inMenu = True
                 board = newBoard()
                 moveHistory = []
                 notationHistory = []
                 turn = "white"
+
             pygame.display.update()
-            
+            for a in range(100):
+                if inCheck(board, turn):
+                    drawCheck(board, turn)
+                else:
+                    print('moin  fnidosghjkhuföil')
+                    drawBoard(board, turn)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT: 
                 sys.exit()
