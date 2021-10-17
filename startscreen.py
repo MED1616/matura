@@ -680,6 +680,7 @@ def main():
             print(pickle.loads(full_msg[8:]))
             
             board = pickle.loads(full_msg[8:])
+            drawBoard(board, turn)
             print(682, board, '----------------------------------------------')
             turn = playerColor
             print(684, not checkForCheckmate(board, turn), checkStalemate(board, turn))
