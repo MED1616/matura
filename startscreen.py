@@ -652,6 +652,7 @@ def main():
                 opponentIP = address[0]
                 print(f"Connection from {address} has been established")
                 data = sOpponent.recv(5096)
+                print(data, len(data))
                 msg = pickle.loads(data)
                 
 
@@ -820,7 +821,7 @@ def main():
                                             sOpponent.connect((opponentIP, 6006))#(IP, Port)
                                         
                                         msg = pickle.dumps(board)
-                                        print( msg, len(msg))
+                                        print(msg, len(msg))
                                         sOpponent.send(msg)
                                         
                                         
