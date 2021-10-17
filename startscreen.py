@@ -640,7 +640,6 @@ def main():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((socket.gethostname(), 59822))#(IP, Port)
     s.listen(5) #queue size
-    f = True 
     while True:
         if chosenVariant == 0 or chosenVariant == 2:
             s.close()
@@ -650,7 +649,7 @@ def main():
             full_msg = b''
             new_msg = True
             msglen = 3000
-
+            f = True
             while f == True or socketOPPONENT.fileno() == -1:
                 f = False
                 socketOPPONENT, address = s.accept()
