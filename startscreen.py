@@ -653,6 +653,7 @@ def main():
 
             while True:
                 socketOPPONENT, address = s.accept()
+                print(address)
                 opponentIP = address[0]
                 print(f"Connection from {address} has been established")
 
