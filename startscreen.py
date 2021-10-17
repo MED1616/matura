@@ -622,7 +622,7 @@ stalemateBoard[7][7] = pieces.King("white")
 
 def main():
     global inMenu
-    NotOpen = True
+    #NotOpen = True
     playerColor = 'both'
     chosenVariant = 4
     top, left, squareSize = defineSize()
@@ -644,8 +644,6 @@ def main():
         if chosenVariant == 0 or chosenVariant == 2:
             s.close()
         if (chosenVariant == 1 or chosenVariant == 3) and playerColor != turn and playerColor != 'both':
-            
-             
             full_msg = b''
             new_msg = True
             msglen = 3000
@@ -681,12 +679,12 @@ def main():
             print(pickle.loads(full_msg[8:]))
             
             board = pickle.loads(full_msg[8:])
-
-            drawBoard(board, turn)
             
             turn = playerColor
             drawBoard(board, turn)
+
             if not checkForCheckmate(board, turn):
+                print(1111111111)
                 checkmateMessage(turn)
                 inMenu = True
                 turn = "white"
@@ -696,6 +694,7 @@ def main():
                 drawBoard(board, turn)
 
                 print("Checkmate, ", turn, " loses")
+
             if checkStalemate(board, turn):
                 drawBoard(board, turn)
 
@@ -861,6 +860,7 @@ def main():
                                         board = newBoard()
                                         moveHistory = []
                                         notationHistory = []
+                                        chosenVariant = 4
                                         turn = "white"
 
                                     drawBoard(board, turn)
@@ -881,8 +881,8 @@ def main():
                                 moveHistory = []
                                 notationHistory = []
                                 drawBoard(board, turn)
-
-                                print("Checkmate, ", turn, " loses")
+                                chosenVariant = 4
+                                print(885, "Checkmate, ", turn, " loses")
                         
                         
                 
