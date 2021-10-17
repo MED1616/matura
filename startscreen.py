@@ -561,6 +561,8 @@ def stalemate():
         for event2 in pygame.event.get():
             if event2.type == pygame.KEYDOWN and event2.key == pygame.K_RETURN:
                 pressedEscape = True
+            elif event2.type == pygame.QUIT: 
+                sys.exit()
     
 def checkForCheckmate(board, turn):
     if inCheck(board, turn):
@@ -610,8 +612,14 @@ def checkmateMessage(turn):
         for event2 in pygame.event.get():
             if event2.type == pygame.KEYDOWN and event2.key == pygame.K_RETURN:
                 pressedEscape = True
+            elif event2.type == pygame.QUIT: 
+                sys.exit()
         
-    
+stalemateBoard = [[None for i in range(8)] for i in range(8)]
+stalemateBoard[0][0] = pieces.King("black")
+stalemateBoard[1][3] = pieces.Queen("white")
+stalemateBoard[7][7] = pieces.King("white")
+
 def main():
     global inMenu
     playerColor = 'both'
@@ -626,6 +634,7 @@ def main():
     
     
     board = newBoard()
+    #board = stalemateBoard
     drawBoard(board, turn)
     
     while True:
@@ -642,6 +651,7 @@ def main():
                 data = clientsocket.recv(5096)
                 msg = pickle.loads(data)
                 clientsocket.close()
+                
 
             board = msg
             turn = playerColor
