@@ -682,7 +682,9 @@ def main():
             print(pickle.loads(full_msg[8:]))
             
             board = full_msg[8:]
-            drawBoard(board)
+
+            drawBoard(board, turn)
+            
             turn = playerColor
             drawBoard(board, turn)
             if not checkForCheckmate(board, turn):
