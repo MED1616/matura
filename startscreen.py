@@ -3,6 +3,8 @@ import sys
 import pygame
 import socket
 import pickle
+import time
+
 
 pygame.init()
 
@@ -654,9 +656,9 @@ def main():
                 socketOPPONENT, address = s.accept()
                 opponentIP = address[0]
                 print(f"Connection from {address} has been established")
-
+                
                 while len(full_msg)-8 != msglen:
-                    print(len(full_msg)-8, msglen)
+                    #print(len(full_msg)-8, msglen)
                     """
                     data = socketOPPONENT.recv(5096)
                     print(data, len(data))
@@ -664,26 +666,33 @@ def main():
                     """
                     msg = socketOPPONENT.recv(16)
                     if new_msg:
-                        print("new msg len:",msg[:8])
+                        #print("new msg len:",msg[:8])
                         msglen = int(msg[:8])
                         new_msg = False
 
-                    print(f"full message length: {msglen}")
+                    #print(f"full message length: {msglen}")
 
                     full_msg += msg
 
-                    print(len(full_msg))
+                    #print(len(full_msg))
 
                 
             print("full msg recvd")
-            print(full_msg[8:])
-            print(pickle.loads(full_msg[8:]))
             
             board = pickle.loads(full_msg[8:])
-            drawBoard(board, turn)
+            
             print(682, board, '----------------------------------------------')
             turn = playerColor
-            print(684, not checkForCheckmate(board, turn), checkStalemate(board, turn))
+            drawBoard(board, turn)
+            pygame.event.get()
+            pygame.display.update()
+            pygame.event.get()
+            if inCheck(board, turn):
+                drawCheck(board, turn)
+            else:
+                drawBoard(board, turn)
+            pygame.display.flip()
+
             if not checkForCheckmate(board, turn):
                 checkmateMessage(turn)
                 inMenu = True
@@ -703,18 +712,12 @@ def main():
                 turn = "white"
 
             pygame.display.update()
-            for a in range(100):
-                if inCheck(board, turn):
-                    drawCheck(board, turn)
-                else:
-                    print('moin  fnidosghjkhuföil')
-                    drawBoard(board, turn)
+            
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT: 
                 sys.exit()
             elif event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pressed()[0] == True:
-
                 if inMenu:
                     pos = pygame.mouse.get_pos()
                     print(pos)
