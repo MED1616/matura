@@ -483,6 +483,8 @@ def displayIP():
 
 def inputField():
     inputFinished = False
+    opponent_ip = '192.168.43.34'
+    clicked = True
     while not inputFinished:
         x, y = screen.get_size()
         textFont = pygame.font.SysFont("calibri", 35, True)
@@ -490,9 +492,6 @@ def inputField():
         left = (screen.get_size()[0] - w)/2
         top = (screen.get_size()[1] - h)/2 + 10
         inputField = pygame.Rect(left, top, w, h)
-        clicked = True
-        inputFinished = False
-        opponent_ip = '192.168.0.1'
 
         (l, t), size = displayIP()
         button = pygame.Rect(l, t, size[0], size[1])
