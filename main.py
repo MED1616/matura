@@ -508,7 +508,7 @@ def displayIP():
 
 def inputField():
     inputFinished = False
-    opponent_ip = '192.168.43.34'
+    opponent_ip = '192.168.0.109'
     clicked = True
     while not inputFinished:
         x, y = screen.get_size()
@@ -666,7 +666,7 @@ def main():
     
     
     board = newBoard()
-    #board = stalemateBoard
+    board = stalemateBoard
     drawBoard(board, turn, orientation)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((socket.gethostname(), 59822))#(IP, Port)
@@ -731,16 +731,17 @@ def main():
                 board = newBoard()
                 moveHistory = []
                 notationHistory = []
-                print("Checkmate, ", turn, " loses")
+                drawBoard(board, turn, orientation)
+                print(734, "Checkmate, ", turn, " loses")
 
             if checkStalemate(board, turn):
-
                 stalemate()
                 inMenu = True
                 board = newBoard()
                 moveHistory = []
                 notationHistory = []
                 turn = "white"
+                drawBoard(board, turn, orientation)
 
             pygame.display.update()
             
