@@ -926,8 +926,6 @@ def main():
                                 drawBoard(board, turn, orientation)
                                 print(885, "Checkmate, ", turn, " loses")
                         
-                        
-                
             elif event.type == pygame.VIDEORESIZE:
                 top, left, squareSize = defineSize()
                 screen.fill(color)
@@ -939,7 +937,6 @@ def main():
                 else:
                     orientation = "white"
                 drawBoard(board, turn, orientation)
-                print("rrrrrrrrrrrrr", orientation)
                 
 
 main()
