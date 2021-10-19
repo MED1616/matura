@@ -731,7 +731,9 @@ def main():
                 board = newBoard()
                 moveHistory = []
                 notationHistory = []
+                chosenVariant = 4
                 drawBoard(board, turn, orientation)
+                
                 print(734, "Checkmate, ", turn, " loses")
 
             if checkStalemate(board, turn):
@@ -741,6 +743,7 @@ def main():
                 moveHistory = []
                 notationHistory = []
                 turn = "white"
+                chosenVariant = 4
                 drawBoard(board, turn, orientation)
 
             pygame.display.update()
@@ -919,8 +922,8 @@ def main():
                                 board = newBoard()
                                 moveHistory = []
                                 notationHistory = []
-                                drawBoard(board, turn, orientation)
                                 chosenVariant = 4
+                                drawBoard(board, turn, orientation)
                                 print(885, "Checkmate, ", turn, " loses")
                         
                         
