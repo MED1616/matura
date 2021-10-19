@@ -365,7 +365,7 @@ def drawCheck(board, turn, orientation):
     square = (left + x * squareSize, top + y *
               squareSize, squareSize, squareSize)
     pygame.draw.rect(screen, (255, 0, 0), square)
-    drawPieces(board)
+    drawPieces(board, orientation)
 
 
 def drawPromotion(c):
