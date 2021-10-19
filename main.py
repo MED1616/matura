@@ -764,6 +764,7 @@ def main():
                         opponentIP = inputField()
                         if opponentIP == True:
                             playerColor = 'black'
+                            orientation = "black"
                             opponentIP = ''
                         else:
                             playerColor = 'white'
